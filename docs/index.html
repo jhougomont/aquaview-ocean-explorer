@@ -469,6 +469,7 @@
     <div class="stat-chip"><span class="num" id="stat-current-speed">—</span><span class="lbl">avg m/s</span></div>
     <div class="stat-chip"><span class="num" id="stat-particles">—</span><span class="lbl">particles</span></div>
     <div class="stat-chip"><span class="num" id="stat-datasets">8</span><span class="lbl">AQUAVIEW datasets</span></div>
+    <div class="stat-chip"><span class="num" id="stat-updated" style="color:#22c55e;cursor:help" title="">—</span><span class="lbl">updated</span></div>
 </div>
 
 <div class="current-legend" id="current-legend">
@@ -494,7 +495,7 @@
             <p>This interactive visualization brings together <span class="highlight">eight real-time oceanographic datasets</span> into a single operational picture of the Gulf of Mexico — powered entirely by <span class="highlight">AQUAVIEW</span>, NOAA's federated ocean data infrastructure.</p>
 
             <h3>What is AQUAVIEW?</h3>
-            <p>AQUAVIEW (Actionable Quality-assured Unified Analytics for Versatile Integrated Environmental Watch) is a NOAA-hosted geospatial data federation built on the <span class="highlight">SpatioTemporal Asset Catalog (STAC)</span> standard. It provides a single, searchable entry point to over 24 oceanographic collections — from real-time buoy sensors to satellite imagery to autonomous glider missions — spanning agencies like NDBC, CO-OPS, CoastWatch, and IOOS.</p>
+            <p>AQUAVIEW is a NOAA-hosted geospatial data federation built on the <span class="highlight">SpatioTemporal Asset Catalog (STAC)</span> standard. It provides a single, searchable entry point to over 24 oceanographic collections — from real-time buoy sensors to satellite imagery to autonomous glider missions — spanning agencies like NDBC, CO-OPS, CoastWatch, and IOOS.</p>
             <p>Rather than querying dozens of siloed APIs individually, researchers and applications can discover, access, and combine ocean data through AQUAVIEW's unified catalog. This explorer demonstrates what becomes possible when those data streams are combined in a single visualization.</p>
 
             <h3>What you're seeing</h3>
@@ -671,7 +672,8 @@ const PARTICLE_LINE_WIDTH = 1.2;
 const SPEED_SCALE = 0.00008;
 const FADE_OPACITY = 0.94;
 const GULF_BOUNDS = { latMin: 18, latMax: 32, lonMin: -98, lonMax: -80 };
-const CURRENT_URL = 'https://coastwatch.noaa.gov/erddap/griddap/noaacwBLENDEDNRTcurrentsDaily.json?u_current[(last)][(18):(32)][(-98):(-80)],v_current[(last)][(18):(32)][(-98):(-80)]';
+const CURRENT_URL_LOCAL = 'data/currents.json?t=' + Date.now();
+const CURRENT_URL_LIVE = 'https://coastwatch.noaa.gov/erddap/griddap/noaacwBLENDEDNRTcurrentsDaily.json?u_current[(last)][(18):(32)][(-98):(-80)],v_current[(last)][(18):(32)][(-98):(-80)]';
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -764,9 +766,17 @@ function clearCanvas() {
 async function fetchCurrents() {
     setLoadingText('Downloading ocean current vectors...');
     try {
-        const resp = await fetch(CURRENT_URL);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const json = await resp.json();
+        // Try pre-fetched static file first (updated by GitHub Actions), then live ERDDAP
+        let json;
+        try {
+            const localResp = await fetch(CURRENT_URL_LOCAL);
+            if (localResp.ok) json = await localResp.json();
+        } catch(e) { /* local fetch failed, try live */ }
+        if (!json) {
+            const liveResp = await fetch(CURRENT_URL_LIVE);
+            if (!liveResp.ok) throw new Error(`HTTP ${liveResp.status}`);
+            json = await liveResp.json();
+        }
 
         const table = json.table;
         const rows = table.rows;
@@ -962,6 +972,15 @@ async function loadNDBCStations() {
             data = EMBEDDED_LATEST;
         }
         if (!data) return 0;
+
+        // Show last-updated time in stats bar
+        if (data.updated) {
+            const d = new Date(data.updated);
+            const ago = Math.round((Date.now() - d.getTime()) / 3600000);
+            const agoStr = ago < 1 ? 'just now' : ago < 24 ? ago + 'h ago' : Math.round(ago/24) + 'd ago';
+            document.getElementById('stat-updated').textContent = agoStr;
+            document.getElementById('stat-updated').title = 'Station data: ' + d.toUTCString();
+        }
 
         const group = L.layerGroup();
         let count = 0;

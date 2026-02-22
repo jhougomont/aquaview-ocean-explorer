@@ -1,0 +1,42 @@
+name: Update Station Data
+
+on:
+  schedule:
+    # Every 6 hours: midnight, 6am, noon, 6pm UTC
+    - cron: '0 0,6,12,18 * * *'
+  workflow_dispatch:  # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch latest NDBC station data
+        run: python scripts/update_stations.py
+
+      - name: Check for changes
+        id: check
+        run: |
+          git diff --quiet docs/data/ && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+          git status --porcelain docs/data/ | grep -q '.' && echo "changed=true" >> $GITHUB_OUTPUT || true
+
+      - name: Commit and push
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
+          git add docs/data/latest.json docs/data/currents.json
+          git commit -m "Update station data: ${TIMESTAMP}"
+          git push
