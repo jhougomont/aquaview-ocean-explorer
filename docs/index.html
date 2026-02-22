@@ -499,7 +499,7 @@
             <p>Rather than querying dozens of siloed APIs individually, researchers and applications can discover, access, and combine ocean data through AQUAVIEW's unified catalog. This explorer demonstrates what becomes possible when those data streams are combined in a single visualization.</p>
 
             <h3>What you're seeing</h3>
-            <p>The map displays <span class="highlight">animated ocean surface currents</span> derived from satellite altimetry (Sentinel-3A/B, CryoSat-2, Jason-3, SARAL), with 4,000 particles tracing flow patterns in real time. Beneath the currents, toggleable satellite imagery shows chlorophyll-a concentration (an indicator of algal productivity), sea surface temperature, and sea surface height anomalies.</p>
+            <p>The map displays <span class="highlight">animated ocean surface currents</span> derived from satellite altimetry (Sentinel-3A/B, CryoSat-2, Jason-3, SARAL), with 5,000 particles tracing flow patterns in real time. Beneath the currents, toggleable satellite imagery shows chlorophyll-a concentration (an indicator of algal productivity), sea surface temperature, and sea surface height anomalies.</p>
             <p>Overlaid on this physical oceanography are <span class="highlight">three in-situ sensor networks</span>: NDBC buoys instrumented for dissolved oxygen monitoring (the hypoxia early warning system), CO-OPS tidal current stations providing 6-minute current meter data, and the broader IOOS water level observation network. Dashed tracks show autonomous underwater glider missions deployed by universities across the Gulf.</p>
 
             <h3>Why it matters</h3>
@@ -520,7 +520,7 @@
                         <strong>Resolution:</strong> 0.25° global grid, daily<br>
                         <strong>Derived from:</strong> Satellite altimetry (geostrophic calculation from SSH gradients)<br>
                         <strong>Satellites:</strong> Sentinel-3A/B, CryoSat-2, Jason-3, SARAL/AltiKa<br>
-                        <strong>Viz:</strong> 4,000 particles with bilinear velocity interpolation
+                        <strong>Viz:</strong> 5,000 particles with bilinear velocity interpolation
                     </div>
                 </div>
                 <div class="data-card">
@@ -666,11 +666,11 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const PARTICLE_COUNT = 4000;
-const PARTICLE_LIFETIME = 80;
-const PARTICLE_LINE_WIDTH = 1.2;
-const SPEED_SCALE = 0.00008;
-const FADE_OPACITY = 0.94;
+const PARTICLE_COUNT = 5000;
+const PARTICLE_LIFETIME = 120;
+const PARTICLE_LINE_WIDTH = 1.6;
+const SPEED_SCALE = 0.0004;
+const FADE_OPACITY = 0.975;
 const GULF_BOUNDS = { latMin: 18, latMax: 32, lonMin: -98, lonMax: -80 };
 const CURRENT_URL_LOCAL = 'data/currents.json?t=' + Date.now();
 const CURRENT_URL_LIVE = 'https://coastwatch.noaa.gov/erddap/griddap/noaacwBLENDEDNRTcurrentsDaily.json?u_current[(last)][(18):(32)][(-98):(-80)],v_current[(last)][(18):(32)][(-98):(-80)]';
@@ -876,19 +876,20 @@ function spawnParticle() {
 }
 
 function speedColor(speed) {
+    // Brighter, more saturated palette — visible on dark basemap
     const t = Math.min(speed / 0.5, 1);
     if (t < 0.25) {
         const s = t / 0.25;
-        return `rgba(${30+80*s}, ${58+130*s}, ${95+158*s}, 0.85)`;
+        return `rgba(${60+100*s}, ${100+120*s}, ${160+90*s}, 0.9)`;  // deep blue → cyan
     } else if (t < 0.5) {
         const s = (t - 0.25) / 0.25;
-        return `rgba(${110+19*s}, ${188-7*s}, ${253-5*s}, 0.9)`;
+        return `rgba(${160-30*s}, ${220}, ${250-10*s}, 1.0)`;  // bright cyan
     } else if (t < 0.75) {
         const s = (t - 0.5) / 0.25;
-        return `rgba(${129+115*s}, ${181-109*s}, ${248-96*s}, 0.9)`;
+        return `rgba(${130+120*s}, ${220-80*s}, ${240-100*s}, 1.0)`;  // cyan → warm
     } else {
         const s = (t - 0.75) / 0.25;
-        return `rgba(${244+7*s}, ${72+119*s}, ${152-128*s}, 0.95)`;
+        return `rgba(${250}, ${140+60*s}, ${140-80*s}, 1.0)`;  // warm orange/coral
     }
 }
 
@@ -901,11 +902,12 @@ function animateParticles() {
     ctx.globalCompositeOperation = 'destination-in';
     ctx.fillStyle = `rgba(0, 0, 0, ${FADE_OPACITY})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalCompositeOperation = 'source-over';
 
     const zoom = map.getZoom();
     const speedMult = SPEED_SCALE * Math.pow(2, 8 - zoom);
-    const lineWidth = PARTICLE_LINE_WIDTH * (zoom > 6 ? 1.5 : 1);
+    const zoomScale = Math.max(1, (zoom - 3) * 0.5);
+    const lineWidth = PARTICLE_LINE_WIDTH * zoomScale;
 
     for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
@@ -934,7 +936,8 @@ function animateParticles() {
             ctx.moveTo(p.prevX, p.prevY);
             ctx.lineTo(pt.x, pt.y);
             ctx.strokeStyle = speedColor(speed);
-            ctx.lineWidth = lineWidth;
+            ctx.lineWidth = lineWidth + speed * 2;
+            ctx.lineCap = 'round';
             ctx.stroke();
         }
 
