@@ -125,45 +125,21 @@
 <div class="layer-panel" id="layer-panel">
 
     <div class="layer-group-header" onclick="toggleGroup('ocean-grp')">
-        <span class="chevron" id="chevron-ocean-grp">▼</span> Ocean Physics
+        <span class="chevron" id="chevron-ocean-grp">▼</span> Ocean Conditions
     </div>
     <div class="layer-group-body" id="grp-ocean-grp">
-        <div class="layer-toggle active" data-layer="currents" style="color:#38bdf8" onclick="toggleLayer('currents')">
-            <div class="dot"></div><span class="label">Current Flow</span><span class="count" id="currents-status">loading</span>
-        </div>
         <div class="layer-toggle active" data-layer="sst_heat" style="color:#f97316" onclick="toggleLayer('sst_heat')">
-            <div class="dot"></div><span class="label">Temperature</span><span class="count" id="sst-heat-count">—</span>
+            <div class="dot"></div><span class="label">Sea Temperature</span><span class="count" id="sst-heat-count">—</span>
         </div>
-        <div class="layer-toggle active" data-layer="water_level" style="color:#06b6d4" onclick="toggleLayer('water_level')">
-            <div class="dot"></div><span class="label">Water Level</span><span class="count" id="wl-count">—</span>
-        </div>
-        <div class="layer-toggle" data-layer="ssh" style="color:#a78bfa" onclick="toggleLayer('ssh')">
-            <div class="dot"></div><span class="label">Sea Surface Height</span><span class="count">WMS</span>
-        </div>
-    </div>
-
-    <div class="layer-group-header" onclick="toggleGroup('bio-grp')">
-        <span class="chevron" id="chevron-bio-grp">▼</span> Biology & Chemistry
-    </div>
-    <div class="layer-group-body" id="grp-bio-grp">
         <div class="layer-toggle active" data-layer="do_field" style="color:#22c55e" onclick="toggleLayer('do_field')">
             <div class="dot"></div><span class="label">Dissolved Oxygen</span><span class="count" id="do-count">—</span>
         </div>
-        <div class="layer-toggle" data-layer="chlorophyll" style="color:#34d399" onclick="toggleLayer('chlorophyll')">
-            <div class="dot"></div><span class="label">Chlorophyll-a</span><span class="count">satellite</span>
+        <div class="layer-toggle active" data-layer="currents" style="color:#38bdf8" onclick="toggleLayer('currents')">
+            <div class="dot"></div><span class="label">Current Flow</span><span class="count" id="currents-status">loading</span>
         </div>
-        <div class="layer-toggle" data-layer="salinity" style="color:#818cf8" onclick="toggleLayer('salinity')">
-            <div class="dot"></div><span class="label">Salinity</span><span class="count">satellite</span>
+        <div class="layer-toggle" data-layer="water_level" style="color:#06b6d4" onclick="toggleLayer('water_level')">
+            <div class="dot"></div><span class="label">Water Level</span><span class="count" id="wl-count">—</span>
         </div>
-        <div class="layer-toggle" data-layer="kd490" style="color:#67e8f9" onclick="toggleLayer('kd490')">
-            <div class="dot"></div><span class="label">Water Clarity</span><span class="count">satellite</span>
-        </div>
-    </div>
-
-    <div class="layer-group-header" onclick="toggleGroup('wx-grp')">
-        <span class="chevron" id="chevron-wx-grp">▼</span> Weather & Waves
-    </div>
-    <div class="layer-group-body" id="grp-wx-grp">
         <div class="layer-toggle" data-layer="wind" style="color:#94a3b8" onclick="toggleLayer('wind')">
             <div class="dot"></div><span class="label">Wind Field</span><span class="count" id="wind-count">—</span>
         </div>
@@ -172,15 +148,54 @@
         </div>
     </div>
 
-    <div class="layer-group-header" onclick="toggleGroup('hazard-grp')">
-        <span class="chevron" id="chevron-hazard-grp">▼</span> Hazards & Operations
+    <div class="layer-group-header" onclick="toggleGroup('sat-grp')">
+        <span class="chevron collapsed" id="chevron-sat-grp">▼</span> Satellite Products
     </div>
-    <div class="layer-group-body" id="grp-hazard-grp">
+    <div class="layer-group-body collapsed" id="grp-sat-grp">
+        <div class="layer-toggle" data-layer="chlorophyll" style="color:#34d399" onclick="toggleLayer('chlorophyll')">
+            <div class="dot"></div><span class="label">Chlorophyll-a</span><span class="count">OLCI</span>
+        </div>
+        <div class="layer-toggle" data-layer="sst" style="color:#f97316" onclick="toggleLayer('sst')">
+            <div class="dot"></div><span class="label">SST (VIIRS)</span><span class="count">WMS</span>
+        </div>
+        <div class="layer-toggle" data-layer="ssh" style="color:#a78bfa" onclick="toggleLayer('ssh')">
+            <div class="dot"></div><span class="label">Sea Surface Height</span><span class="count">WMS</span>
+        </div>
+        <div class="layer-toggle" data-layer="salinity" style="color:#818cf8" onclick="toggleLayer('salinity')">
+            <div class="dot"></div><span class="label">Salinity (SMOS)</span><span class="count">WMS</span>
+        </div>
+        <div class="layer-toggle" data-layer="kd490" style="color:#67e8f9" onclick="toggleLayer('kd490')">
+            <div class="dot"></div><span class="label">Water Clarity</span><span class="count">WMS</span>
+        </div>
+    </div>
+
+    <div class="layer-group-header" onclick="toggleGroup('glider-grp')">
+        <span class="chevron" id="chevron-glider-grp">▼</span> Glider Fleet
+    </div>
+    <div class="layer-group-body" id="grp-glider-grp">
+        <div class="layer-toggle active" data-layer="glider_bass" style="color:#c084fc" onclick="toggleLayer('glider_bass')">
+            <div class="dot"></div><span class="label">Bass</span><span class="count" id="glider-bass-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="glider_gansett" style="color:#60a5fa" onclick="toggleLayer('glider_gansett')">
+            <div class="dot"></div><span class="label">Gansett</span><span class="count" id="glider-gansett-count">—</span>
+        </div>
+        <div class="layer-toggle active" data-layer="glider_jaialai" style="color:#f472b6" onclick="toggleLayer('glider_jaialai')">
+            <div class="dot"></div><span class="label">Jai Alai</span><span class="count" id="glider-jaialai-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="glider_sam" style="color:#fb923c" onclick="toggleLayer('glider_sam')">
+            <div class="dot"></div><span class="label">Sam</span><span class="count" id="glider-sam-count">—</span>
+        </div>
+        <div class="layer-toggle active" data-layer="glider_stella" style="color:#34d399" onclick="toggleLayer('glider_stella')">
+            <div class="dot"></div><span class="label">Stella</span><span class="count" id="glider-stella-count">—</span>
+        </div>
+    </div>
+
+    <div class="layer-group-header" onclick="toggleGroup('hazard-grp')">
+        <span class="chevron collapsed" id="chevron-hazard-grp">▼</span> Hazards & Events
+    </div>
+    <div class="layer-group-body collapsed" id="grp-hazard-grp">
         <div class="layer-toggle" data-layer="incidents" style="color:#ef4444" onclick="toggleLayer('incidents')">
             <div class="dot"></div><span class="label">Pollution Incidents</span><span class="count" id="incidents-count">—</span>
-        </div>
-        <div class="layer-toggle active" data-layer="gliders" style="color:#c084fc" onclick="toggleLayer('gliders')">
-            <div class="dot"></div><span class="label">Glider Missions</span><span class="count" id="glider-count">—</span>
         </div>
         <div class="layer-toggle" data-layer="pmel" style="color:#f472b6" onclick="toggleLayer('pmel')">
             <div class="dot"></div><span class="label">Hurricane Probes</span><span class="count" id="pmel-count">—</span>
@@ -191,7 +206,7 @@
     </div>
 
     <div class="layer-group-header" onclick="toggleGroup('raw-grp')">
-        <span class="chevron" id="chevron-raw-grp">▼</span> Station Networks
+        <span class="chevron collapsed" id="chevron-raw-grp">▼</span> Station Networks
     </div>
     <div class="layer-group-body collapsed" id="grp-raw-grp">
         <div class="layer-toggle" data-layer="ndbc_met" style="color:#fbbf24" onclick="toggleLayer('ndbc_met')">
@@ -199,9 +214,6 @@
         </div>
         <div class="layer-toggle" data-layer="ioos" style="color:#2dd4bf" onclick="toggleLayer('ioos')">
             <div class="dot"></div><span class="label">IOOS Sensors</span><span class="count" id="ioos-count">—</span>
-        </div>
-        <div class="layer-toggle" data-layer="sst" style="color:#f97316" onclick="toggleLayer('sst')">
-            <div class="dot"></div><span class="label">SST Satellite</span><span class="count">VIIRS</span>
         </div>
     </div>
 </div>
@@ -233,7 +245,7 @@
         <div class="hl-bar" style="background: linear-gradient(to right, #dc2828, #f08c28, #fadc28, #50dc46, #32c878)"></div>
         <div class="hl-labels"><span>0</span><span>2</span><span>4</span><span>6</span><span>10</span></div>
     </div>
-    <div class="heat-legend" id="legend-wl" style="display:block">
+    <div class="heat-legend" id="legend-wl" style="display:none">
         <div class="hl-title" style="color:#06b6d4">Water Level (m)</div>
         <div class="hl-bar" style="background: linear-gradient(to right, #143cb4, #32a0dc, #6edcd2, #c8b464, #fa9628)"></div>
         <div class="hl-labels"><span>-0.5</span><span>0</span><span>0.5</span><span>1.0</span></div>
@@ -346,10 +358,11 @@ let particles = [];
 let animRunning = true;
 let layerState = {
     currents: true, ssh: false, drifters: false,
-    sst_heat: true, water_level: true, do_field: true,
+    sst_heat: true, water_level: false, do_field: true,
     chlorophyll: false, sst: false, salinity: false, kd490: false,
     ndbc_met: false, ioos: false,
-    incidents: false, pmel: false, gliders: true,
+    incidents: false, pmel: false,
+    glider_bass: true, glider_gansett: false, glider_jaialai: true, glider_sam: false, glider_stella: true,
     wind: false, waves: false
 };
 // Internal: ndbc layer always loads (feeds DO field) but has no separate toggle
@@ -737,16 +750,19 @@ async function loadGliders() {
         const r = await fetch('data/gliders.json?t=' + Date.now());
         if (!r.ok) return 0;
         const data = await r.json();
-        const group = L.layerGroup(); let count = 0;
+        let totalCount = 0;
 
-        // Color-code by glider name (extract base name before date suffix)
-        const gliderColors = {};
-        const palette = ['#c084fc','#60a5fa','#f472b6','#fb923c','#34d399'];
-        let colorIdx = 0;
+        // Map of glider short name → { layerKey, color, countId }
+        const gliderMeta = {
+            'usf-bass':    { key: 'glider_bass',    color: '#c084fc', countId: 'glider-bass-count' },
+            'usf-gansett': { key: 'glider_gansett',  color: '#60a5fa', countId: 'glider-gansett-count' },
+            'usf-jaialai': { key: 'glider_jaialai',  color: '#f472b6', countId: 'glider-jaialai-count' },
+            'usf-sam':     { key: 'glider_sam',      color: '#fb923c', countId: 'glider-sam-count' },
+            'usf-stella':  { key: 'glider_stella',   color: '#34d399', countId: 'glider-stella-count' }
+        };
+
         function getGliderName(id) {
-            // "usf-stella-20251114T0000" → "usf-stella"
             const parts = id.split('-');
-            // Find where the date part starts (begins with digit)
             for (let i = parts.length - 1; i >= 1; i--) {
                 if (/^\d/.test(parts[i])) continue;
                 return parts.slice(0, i + 1).join('-');
@@ -763,21 +779,18 @@ async function loadGliders() {
             byGlider[name].push(g);
         });
 
-        // Assign colors per glider
-        Object.keys(byGlider).sort().forEach(name => {
-            gliderColors[name] = palette[colorIdx % palette.length];
-            colorIdx++;
-        });
-
-        // Render each glider's deployments
+        // Create a separate layer group for each glider
         Object.entries(byGlider).forEach(([name, deployments]) => {
-            const color = gliderColors[name];
+            const meta = gliderMeta[name];
+            if (!meta) return; // Unknown glider, skip
+            const color = meta.color;
             const displayName = name.replace('usf-', '').toUpperCase();
+            const group = L.layerGroup();
+            let count = 0;
 
-            // Sort by start date
             deployments.sort((a, b) => (a.start || '').localeCompare(b.start || ''));
 
-            // If multiple deployments, connect them with a track line
+            // Connect multiple deployments with dashed line
             if (deployments.length > 1) {
                 const allPts = deployments.map(g => {
                     const c = g.track[g.track.length - 1];
@@ -786,7 +799,6 @@ async function loadGliders() {
                 L.polyline(allPts, { color, weight: 2.5, opacity: 0.5, dashArray: '8 4' }).addTo(group);
             }
 
-            // Also draw full tracks if available
             deployments.forEach((g, di) => {
                 count++;
                 const latLngs = g.track.map(c => [c[1], c[0]]);
@@ -794,25 +806,26 @@ async function loadGliders() {
                     L.polyline(latLngs, { color, weight: 2, opacity: 0.7 }).addTo(group);
                 }
                 const last = latLngs[latLngs.length - 1];
-                const isRecent = g.end && (Date.now() - new Date(g.end).getTime()) < 30 * 86400000;
                 const isLatest = di === deployments.length - 1;
                 L.circleMarker(last, {
                     radius: isLatest ? 8 : 4,
                     color, fillColor: color,
                     fillOpacity: isLatest ? 1 : 0.5,
                     weight: isLatest ? 2.5 : 1
-                }).addTo(group).bindPopup(`<div style="font-weight:700;color:${color};font-size:14px">🤿 ${displayName}</div>
+                }).addTo(group).bindPopup(`<div style="font-weight:700;color:${color};font-size:14px">\u{1F93F} ${displayName}</div>
                     <div style="color:#e0e6f0;font-size:12px;margin:4px 0">${g.title || g.id}</div>
-                    <div style="color:#94a3b8;font-size:11px">${g.start ? g.start.slice(0,10) : ''}${g.end ? ' → ' + g.end.slice(0,10) : ''}</div>
+                    <div style="color:#94a3b8;font-size:11px">${g.start ? g.start.slice(0,10) : ''}${g.end ? ' \u2192 ' + g.end.slice(0,10) : ''}</div>
                     <div style="color:#64748b;font-size:10px;margin-top:4px">Deployment ${di + 1} of ${deployments.length}</div>
                     <div style="color:#64748b;font-size:10px">Track: ${g.track.length} pts</div>`);
             });
+
+            leafletLayers[meta.key] = group;
+            if (layerState[meta.key]) group.addTo(map);
+            setCount(meta.countId, count);
+            totalCount += count;
         });
 
-        leafletLayers.gliders = group;
-        if (layerState.gliders) group.addTo(map);
-        setCount('glider-count', count);
-        return count;
+        return totalCount;
     } catch (e) { console.error('Gliders load failed:', e); return 0; }
 }
 
