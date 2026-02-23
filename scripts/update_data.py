@@ -473,8 +473,43 @@ def update_coops():
     print(f"  Total: {len(stations)} stations, {fetched} with water levels")
 
 
+def fetch_glider_track(dataset_id: str, erddap_base: str = "https://gliders.ioos.us/erddap") -> list:
+    """Fetch actual trajectory from IOOS Gliders ERDDAP. Returns [[lon, lat], ...]."""
+    url = (
+        f"{erddap_base}/tabledap/{dataset_id}.json"
+        f"?time,latitude,longitude&orderBy(%22time%22)"
+    )
+    try:
+        req = urllib.request.Request(url)
+        req.add_header("User-Agent", "AQUAVIEW-COP/1.0")
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            if resp.status != 200:
+                return []
+            data = json.loads(resp.read().decode())
+        rows = data.get("table", {}).get("rows", [])
+        if not rows:
+            return []
+        # Rows are [time, lat, lon] — subsample to max 200 points
+        step = max(1, len(rows) // 200)
+        track = []
+        for i in range(0, len(rows), step):
+            _time, lat, lon = rows[i]
+            if lat is not None and lon is not None:
+                track.append([round(lon, 4), round(lat, 4)])
+        # Always include the last point
+        _time, last_lat, last_lon = rows[-1]
+        if last_lat is not None and last_lon is not None:
+            last_pt = [round(last_lon, 4), round(last_lat, 4)]
+            if not track or track[-1] != last_pt:
+                track.append(last_pt)
+        return track
+    except Exception as e:
+        print(f"    Track fetch failed for {dataset_id}: {e}")
+        return []
+
+
 def update_gliders():
-    """Fetch active glider tracks from AQUAVIEW IOOS collection."""
+    """Fetch active glider tracks from AQUAVIEW IOOS collection + ERDDAP trajectories."""
     print("\n── Glider Tracks ──")
     items = fetch_aquaview_items("IOOS", limit=100)
 
@@ -488,34 +523,51 @@ def update_gliders():
         if not any(kw in title.lower() for kw in ("glider", "slocum", "spray", "seaglider", "sg", "ru", "usf")):
             continue
 
-        # Get trajectory from geometry
-        coords = geom.get("coordinates", [])
-        geom_type = geom.get("type", "")
+        dataset_id = item.get("id", "")
 
-        if geom_type == "LineString" and len(coords) >= 2:
-            track = [[round(c[0], 4), round(c[1], 4)] for c in coords[-100:]]  # Last 100 pts
-        elif geom_type == "Point":
-            track = [[round(coords[0], 4), round(coords[1], 4)]]
-        elif geom_type == "MultiPoint":
-            track = [[round(c[0], 4), round(c[1], 4)] for c in coords[-100:]]
+        # Try fetching real track from ERDDAP first
+        erddap_src = props.get("aquaview:source_url", "")
+        erddap_base = "https://gliders.ioos.us/erddap"
+        if "erddap" in erddap_src:
+            try:
+                parsed = urllib.parse.urlparse(erddap_src)
+                erddap_base = f"{parsed.scheme}://{parsed.netloc}/erddap"
+            except:
+                pass
+
+        print(f"  Fetching track: {dataset_id}...", end=" ")
+        track = fetch_glider_track(dataset_id, erddap_base)
+        if track and len(track) > 1:
+            print(f"{len(track)} pts")
         else:
-            # Try to get position from bbox
-            bbox = item.get("bbox")
-            if bbox and len(bbox) >= 4:
-                cx = (bbox[0] + bbox[2]) / 2
-                cy = (bbox[1] + bbox[3]) / 2
-                track = [[round(cx, 4), round(cy, 4)]]
+            # Fallback to STAC geometry
+            coords = geom.get("coordinates", [])
+            geom_type = geom.get("type", "")
+            if geom_type == "LineString" and len(coords) >= 2:
+                track = [[round(c[0], 4), round(c[1], 4)] for c in coords[-100:]]
+            elif geom_type == "Point":
+                track = [[round(coords[0], 4), round(coords[1], 4)]]
+            elif geom_type == "MultiPoint":
+                track = [[round(c[0], 4), round(c[1], 4)] for c in coords[-100:]]
             else:
-                continue
+                bbox = item.get("bbox")
+                if bbox and len(bbox) >= 4:
+                    cx = (bbox[0] + bbox[2]) / 2
+                    cy = (bbox[1] + bbox[3]) / 2
+                    track = [[round(cx, 4), round(cy, 4)]]
+                else:
+                    print("skipped (no geometry)")
+                    continue
+            print(f"{len(track)} pts (from STAC)")
 
         gliders.append({
-            "id": item.get("id", ""),
+            "id": dataset_id,
             "title": title[:80],
             "track": track,
             "vars": props.get("aquaview:variables", [])[:6],
             "start": props.get("start_datetime", props.get("datetime", "")),
             "end": props.get("end_datetime", ""),
-            "src": props.get("aquaview:source_url", "")[:200],
+            "src": erddap_src[:200],
         })
 
     result = {

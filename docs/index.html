@@ -10,7 +10,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0e1a; color: #e0e6f0; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
         #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
-        #current-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 450; }
+        #current-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 420; }
 
         /* ─── Title Bar ─── */
         .title-bar { position: absolute; top: 16px; left: 60px; z-index: 1000; display: flex; align-items: center; gap: 12px; }
@@ -68,11 +68,16 @@
         .do-label::before { display: none !important; }
         .hide-do-labels .do-label { display: none !important; }
 
-        /* ─── Current Legend ─── */
+        /* ─── Legends ─── */
         .current-legend { position: absolute; bottom: 70px; right: 16px; z-index: 1000; background: rgba(10,14,26,0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 12px; font-size: 10px; }
         .current-legend .title { font-weight: 600; margin-bottom: 4px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; }
         .current-legend .bar { height: 6px; width: 100px; border-radius: 3px; margin: 3px 0; }
         .current-legend .labels { display: flex; justify-content: space-between; color: #64748b; font-family: 'JetBrains Mono', monospace; }
+        .heatmap-legends { position: absolute; bottom: 70px; left: 16px; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
+        .heat-legend { background: rgba(10,14,26,0.90); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 7px 12px; font-size: 10px; min-width: 160px; }
+        .heat-legend .hl-title { font-weight: 600; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.06em; font-size: 9px; }
+        .heat-legend .hl-bar { height: 8px; border-radius: 4px; margin: 3px 0; }
+        .heat-legend .hl-labels { display: flex; justify-content: space-between; color: #64748b; font-family: 'JetBrains Mono', monospace; font-size: 9px; }
 
         /* ─── About Panel ─── */
         .about-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 3000; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
@@ -99,7 +104,7 @@
         .tab-pane.active { display: block; }
 
         /* Wind barb canvas */
-        #heat-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 430; }
+        #heat-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 450; }
         #wind-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 440; }
     </style>
 </head>
@@ -171,7 +176,7 @@
         <span class="chevron" id="chevron-hazard-grp">▼</span> Hazards & Operations
     </div>
     <div class="layer-group-body" id="grp-hazard-grp">
-        <div class="layer-toggle active" data-layer="incidents" style="color:#ef4444" onclick="toggleLayer('incidents')">
+        <div class="layer-toggle" data-layer="incidents" style="color:#ef4444" onclick="toggleLayer('incidents')">
             <div class="dot"></div><span class="label">Pollution Incidents</span><span class="count" id="incidents-count">—</span>
         </div>
         <div class="layer-toggle active" data-layer="gliders" style="color:#c084fc" onclick="toggleLayer('gliders')">
@@ -214,6 +219,25 @@
     <div class="title">Current Speed</div>
     <div class="bar" style="background: linear-gradient(to right, #1e3a5f, #38bdf8, #818cf8, #f472b6, #fbbf24)"></div>
     <div class="labels"><span>0</span><span>0.25</span><span>0.5</span><span>m/s</span></div>
+</div>
+
+<!-- ═══════ HEATMAP LEGENDS ═══════ -->
+<div class="heatmap-legends" id="heatmap-legends">
+    <div class="heat-legend" id="legend-sst" style="display:block">
+        <div class="hl-title" style="color:#f97316">Temperature (°C)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #1e3cb4, #50aae6, #32dc14, #f0dc14, #fa6e14, #fa2814)"></div>
+        <div class="hl-labels"><span>14</span><span>18</span><span>22</span><span>26</span><span>30</span></div>
+    </div>
+    <div class="heat-legend" id="legend-do" style="display:block">
+        <div class="hl-title" style="color:#22c55e">Dissolved Oxygen (mg/L)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #dc2828, #f08c28, #fadc28, #50dc46, #32c878)"></div>
+        <div class="hl-labels"><span>0</span><span>2</span><span>4</span><span>6</span><span>10</span></div>
+    </div>
+    <div class="heat-legend" id="legend-wl" style="display:block">
+        <div class="hl-title" style="color:#06b6d4">Water Level (m)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #143cb4, #32a0dc, #6edcd2, #c8b464, #fa9628)"></div>
+        <div class="hl-labels"><span>-0.5</span><span>0</span><span>0.5</span><span>1.0</span></div>
+    </div>
 </div>
 
 <!-- ═══════ ABOUT ═══════ -->
@@ -304,11 +328,11 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const PARTICLE_COUNT = 2000;
-const PARTICLE_LIFETIME = 100;
-const PARTICLE_LINE_WIDTH = 1.0;
+const PARTICLE_COUNT = 1500;
+const PARTICLE_LIFETIME = 80;
+const PARTICLE_LINE_WIDTH = 0.8;
 const SPEED_SCALE = 0.0004;
-const FADE_OPACITY = 0.92;
+const FADE_OPACITY = 0.88;
 const GULF_BOUNDS = { latMin: 18, latMax: 32, lonMin: -98, lonMax: -80 };
 const CURRENT_URL_LOCAL = 'data/currents.json?t=' + Date.now();
 const CURRENT_URL_LIVE = 'https://coastwatch.noaa.gov/erddap/griddap/noaacwBLENDEDNRTcurrentsDaily.json?u_current[(last)][(18):(32)][(-98):(-80)],v_current[(last)][(18):(32)][(-98):(-80)]';
@@ -325,7 +349,7 @@ let layerState = {
     sst_heat: true, water_level: true, do_field: true,
     chlorophyll: false, sst: false, salinity: false, kd490: false,
     ndbc_met: false, ioos: false,
-    incidents: true, pmel: false, gliders: true,
+    incidents: false, pmel: false, gliders: true,
     wind: false, waves: false
 };
 // Internal: ndbc layer always loads (feeds DO field) but has no separate toggle
@@ -495,10 +519,10 @@ function spawnParticle() {
 }
 function speedColor(speed) {
     const t = Math.min(speed / 0.5, 1);
-    if (t < 0.25) { const s = t/0.25; return `rgba(${60+100*s},${100+120*s},${160+90*s},0.45)`; }
-    else if (t < 0.5) { const s = (t-0.25)/0.25; return `rgba(${160-30*s},220,${250-10*s},0.55)`; }
-    else if (t < 0.75) { const s = (t-0.5)/0.25; return `rgba(${130+120*s},${220-80*s},${240-100*s},0.65)`; }
-    else { const s = (t-0.75)/0.25; return `rgba(250,${140+60*s},${140-80*s},0.8)`; }
+    if (t < 0.25) { const s = t/0.25; return `rgba(${60+100*s},${100+120*s},${160+90*s},0.25)`; }
+    else if (t < 0.5) { const s = (t-0.25)/0.25; return `rgba(${160-30*s},220,${250-10*s},0.30)`; }
+    else if (t < 0.75) { const s = (t-0.5)/0.25; return `rgba(${130+120*s},${220-80*s},${240-100*s},0.35)`; }
+    else { const s = (t-0.75)/0.25; return `rgba(250,${140+60*s},${140-80*s},0.45)`; }
 }
 function animateParticles() {
     if (!animRunning || !layerState.currents || !currentGrid) { requestAnimationFrame(animateParticles); return; }
@@ -714,25 +738,77 @@ async function loadGliders() {
         if (!r.ok) return 0;
         const data = await r.json();
         const group = L.layerGroup(); let count = 0;
-        const colors = ['#c084fc','#60a5fa','#f472b6','#fb923c','#a78bfa','#34d399','#fbbf24','#818cf8'];
-        (data.gliders || []).forEach((g, i) => {
-            if (!g.track || g.track.length === 0) return; count++;
-            const color = colors[i % colors.length];
-            const latLngs = g.track.map(c => [c[1], c[0]]);  // [lat, lon]
-            if (latLngs.length > 1) {
-                L.polyline(latLngs, { color, weight: 2, opacity: 0.6, dashArray: '6 3' }).addTo(group);
+
+        // Color-code by glider name (extract base name before date suffix)
+        const gliderColors = {};
+        const palette = ['#c084fc','#60a5fa','#f472b6','#fb923c','#34d399'];
+        let colorIdx = 0;
+        function getGliderName(id) {
+            // "usf-stella-20251114T0000" → "usf-stella"
+            const parts = id.split('-');
+            // Find where the date part starts (begins with digit)
+            for (let i = parts.length - 1; i >= 1; i--) {
+                if (/^\d/.test(parts[i])) continue;
+                return parts.slice(0, i + 1).join('-');
             }
-            // Current position (last point)
-            const last = latLngs[latLngs.length - 1];
-            const isRecent = g.end && (Date.now() - new Date(g.end).getTime()) < 30 * 86400000;
-            L.circleMarker(last, {
-                radius: isRecent ? 7 : 5, color, fillColor: color,
-                fillOpacity: isRecent ? 1 : 0.7, weight: isRecent ? 2.5 : 1.5
-            }).addTo(group).bindPopup(`<div style="font-weight:600;color:${color};font-size:13px">${g.title || g.id}</div>
-                <div style="color:#94a3b8;font-size:11px;margin-bottom:4px">${g.start ? g.start.slice(0,10) : ''}${g.end ? ' → ' + g.end.slice(0,10) : ''}</div>
-                <div style="color:#64748b;font-size:10px">Track: ${g.track.length} pts</div>
-                <div style="color:#64748b;font-size:10px">Vars: ${(g.vars||[]).slice(0,5).join(', ')}</div>`);
+            return parts[0];
+        }
+
+        // Group deployments by glider
+        const byGlider = {};
+        (data.gliders || []).forEach(g => {
+            if (!g.track || g.track.length === 0) return;
+            const name = getGliderName(g.id);
+            if (!byGlider[name]) byGlider[name] = [];
+            byGlider[name].push(g);
         });
+
+        // Assign colors per glider
+        Object.keys(byGlider).sort().forEach(name => {
+            gliderColors[name] = palette[colorIdx % palette.length];
+            colorIdx++;
+        });
+
+        // Render each glider's deployments
+        Object.entries(byGlider).forEach(([name, deployments]) => {
+            const color = gliderColors[name];
+            const displayName = name.replace('usf-', '').toUpperCase();
+
+            // Sort by start date
+            deployments.sort((a, b) => (a.start || '').localeCompare(b.start || ''));
+
+            // If multiple deployments, connect them with a track line
+            if (deployments.length > 1) {
+                const allPts = deployments.map(g => {
+                    const c = g.track[g.track.length - 1];
+                    return [c[1], c[0]];
+                });
+                L.polyline(allPts, { color, weight: 2.5, opacity: 0.5, dashArray: '8 4' }).addTo(group);
+            }
+
+            // Also draw full tracks if available
+            deployments.forEach((g, di) => {
+                count++;
+                const latLngs = g.track.map(c => [c[1], c[0]]);
+                if (latLngs.length > 1) {
+                    L.polyline(latLngs, { color, weight: 2, opacity: 0.7 }).addTo(group);
+                }
+                const last = latLngs[latLngs.length - 1];
+                const isRecent = g.end && (Date.now() - new Date(g.end).getTime()) < 30 * 86400000;
+                const isLatest = di === deployments.length - 1;
+                L.circleMarker(last, {
+                    radius: isLatest ? 8 : 4,
+                    color, fillColor: color,
+                    fillOpacity: isLatest ? 1 : 0.5,
+                    weight: isLatest ? 2.5 : 1
+                }).addTo(group).bindPopup(`<div style="font-weight:700;color:${color};font-size:14px">🤿 ${displayName}</div>
+                    <div style="color:#e0e6f0;font-size:12px;margin:4px 0">${g.title || g.id}</div>
+                    <div style="color:#94a3b8;font-size:11px">${g.start ? g.start.slice(0,10) : ''}${g.end ? ' → ' + g.end.slice(0,10) : ''}</div>
+                    <div style="color:#64748b;font-size:10px;margin-top:4px">Deployment ${di + 1} of ${deployments.length}</div>
+                    <div style="color:#64748b;font-size:10px">Track: ${g.track.length} pts</div>`);
+            });
+        });
+
         leafletLayers.gliders = group;
         if (layerState.gliders) group.addTo(map);
         setCount('glider-count', count);
@@ -860,13 +936,13 @@ function renderHeatmaps() {
     // Determine which heatmaps to render
     const jobs = [];
     if (layerState.sst_heat && allTempPoints.length >= 3) {
-        jobs.push({ pts: allTempPoints, vmin: 14, vmax: 30, scheme: 'thermal', maxDist: 350, baseAlpha: 0.40 });
+        jobs.push({ pts: allTempPoints, vmin: 14, vmax: 30, scheme: 'thermal', maxDist: 500, baseAlpha: 0.65 });
     }
     if (layerState.do_field && allDOPoints.length >= 2) {
-        jobs.push({ pts: allDOPoints, vmin: 0, vmax: 10, scheme: 'oxygen', maxDist: 250, baseAlpha: 0.45 });
+        jobs.push({ pts: allDOPoints, vmin: 0, vmax: 10, scheme: 'oxygen', maxDist: 400, baseAlpha: 0.70 });
     }
     if (layerState.water_level && allWLPoints.length >= 3) {
-        jobs.push({ pts: allWLPoints, vmin: -0.5, vmax: 1.0, scheme: 'tidal', maxDist: 200, baseAlpha: 0.35 });
+        jobs.push({ pts: allWLPoints, vmin: -0.5, vmax: 1.0, scheme: 'tidal', maxDist: 300, baseAlpha: 0.55 });
     }
     if (jobs.length === 0) return;
 
@@ -1047,6 +1123,7 @@ function toggleLayer(name) {
         if (!layerState.currents) clearCanvas();
     } else if (name === 'sst_heat' || name === 'do_field' || name === 'water_level') {
         renderHeatmaps();
+        updateHeatmapLegends();
         // Also toggle associated marker layers
         if (name === 'do_field' && leafletLayers.ndbc) {
             if (layerState.do_field) leafletLayers.ndbc.addTo(map); else map.removeLayer(leafletLayers.ndbc);
@@ -1065,6 +1142,18 @@ function toggleLayer(name) {
     }
 }
 window.toggleLayer = toggleLayer;
+
+// ═══════════════════════════════════════════════════════════
+// LEGEND MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+function updateHeatmapLegends() {
+    const sst = document.getElementById('legend-sst');
+    const dol = document.getElementById('legend-do');
+    const wl = document.getElementById('legend-wl');
+    if (sst) sst.style.display = layerState.sst_heat ? 'block' : 'none';
+    if (dol) dol.style.display = layerState.do_field ? 'block' : 'none';
+    if (wl) wl.style.display = layerState.water_level ? 'block' : 'none';
+}
 
 // ═══════════════════════════════════════════════════════════
 // INIT
