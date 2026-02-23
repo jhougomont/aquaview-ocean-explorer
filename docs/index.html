@@ -257,21 +257,63 @@
     <div class="about-panel">
         <button class="about-close" onclick="toggleAbout()">&times;</button>
         <div class="about-tabs">
-            <div class="about-tab active" onclick="switchTab('overview')">Overview</div>
+            <div class="about-tab active" onclick="switchTab('aquaview')">Powered by AQUAVIEW</div>
+            <div class="about-tab" onclick="switchTab('overview')">COP Overview</div>
             <div class="about-tab" onclick="switchTab('layers')">Data Layers</div>
             <div class="about-tab" onclick="switchTab('tech')">Technology</div>
             <div class="about-tab" onclick="switchTab('models')">ML Models</div>
         </div>
 
-        <div class="about-content tab-pane active" id="tab-overview">
-            <h2>AQUAVIEW Gulf Ocean Intelligence Explorer</h2>
-            <p>The <span class="hl">ultimate Common Operating Picture</span> for the Gulf of Mexico — bringing together <span class="hl">22 real-time layers</span> across 9 AQUAVIEW data collections into a single visualization. Surface currents, satellite imagery, thousands of in-situ sensors, glider missions, drifter tracks, oil spill alerts, and weather observations — all sourced through AQUAVIEW's federated ocean data infrastructure.</p>
+        <div class="about-content tab-pane active" id="tab-aquaview">
+            <h2 style="display:flex;align-items:center;gap:10px">
+                <span style="font-size:24px">🌊</span> Powered by AQUAVIEW
+            </h2>
+            <p>This Common Operating Picture would not be possible without <span class="hl">AQUAVIEW</span> — a federated ocean data infrastructure that unifies dozens of disparate oceanographic data sources into a single, standards-based discovery layer.</p>
+
             <h3>What is AQUAVIEW?</h3>
-            <p>AQUAVIEW is a NOAA-hosted geospatial data federation built on the <span class="hl">SpatioTemporal Asset Catalog (STAC)</span> standard. It provides a single, searchable entry point to over 24 oceanographic collections spanning NDBC, CO-OPS, CoastWatch, IOOS, PMEL, and more. This explorer queries AQUAVIEW every 6 hours to discover and fetch the latest Gulf data.</p>
+            <p>AQUAVIEW is a geospatial data federation built on the <span class="hl">SpatioTemporal Asset Catalog (STAC)</span> standard. It provides a single, searchable API spanning <span class="hl">24+ oceanographic collections</span> from NOAA, IOOS, CoastWatch, and other providers — making it possible to discover and access real-time ocean observations that would otherwise require querying dozens of different APIs, formats, and endpoints.</p>
+
+            <h3>The Problem AQUAVIEW Solves</h3>
+            <p>Ocean data is fragmented across agencies, formats, and access protocols. NDBC buoy data lives on one system, CO-OPS tidal stations on another, glider missions on a third, satellite products on yet another. Building a comprehensive operational picture traditionally requires writing and maintaining separate integrations for each. AQUAVIEW collapses this complexity by cataloging all sources into a uniform STAC interface with standardized metadata, bounding-box spatial queries, and direct links to source ERDDAP servers.</p>
+
+            <h3>How This COP Uses AQUAVIEW</h3>
+            <p>Every 6 hours, our automated pipeline queries the AQUAVIEW STAC API with a Gulf of Mexico bounding-box filter. For each matching item, AQUAVIEW provides <code>aquaview:source_url</code> pointing to the live ERDDAP endpoint and <code>aquaview:variables</code> listing available parameters. This lets us automatically discover and fetch the latest data across all 9 collections powering this COP — without hard-coding a single data source URL.</p>
+
+            <div class="data-grid" style="margin-top:16px">
+                <div class="data-card">
+                    <div class="dc-title"><span class="dc-dot" style="background:#38bdf8"></span> 24+ Collections</div>
+                    <div class="dc-detail">NDBC, CO-OPS, IOOS, CoastWatch, PMEL, Gliders, Incidents, Drifters, and more — all searchable from one endpoint</div>
+                </div>
+                <div class="data-card">
+                    <div class="dc-title"><span class="dc-dot" style="background:#22c55e"></span> STAC Standard</div>
+                    <div class="dc-detail">OGC-compliant metadata with spatial/temporal queries, so any STAC client can discover Gulf data</div>
+                </div>
+                <div class="data-card">
+                    <div class="dc-title"><span class="dc-dot" style="background:#f97316"></span> Source-Linked</div>
+                    <div class="dc-detail">Each STAC item links directly to the authoritative ERDDAP source — no data duplication, always fresh</div>
+                </div>
+                <div class="data-card">
+                    <div class="dc-title"><span class="dc-dot" style="background:#c084fc"></span> Zero Lock-in</div>
+                    <div class="dc-detail">Standard protocols (STAC, ERDDAP, OPeNDAP) mean this COP can be rebuilt against any compatible federation</div>
+                </div>
+            </div>
+
+            <h3>AQUAVIEW API</h3>
+            <p style="font-family:'JetBrains Mono',monospace;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 14px;color:#38bdf8;word-break:break-all">
+                https://aquaview-sfeos-1025757962819.us-east1.run.app/collections
+            </p>
+            <p style="margin-top:8px">Query any collection, filter by bounding box and time, and follow <code>aquaview:source_url</code> links to get live data from the original providers.</p>
+        </div>
+
+        <div class="about-content tab-pane" id="tab-overview">
+            <h2>Gulf Ocean Intelligence COP</h2>
+            <p>The <span class="hl">ultimate Common Operating Picture</span> for the Gulf of Mexico — bringing together <span class="hl">22 real-time layers</span> across 9 AQUAVIEW data collections into a single visualization. Surface currents, satellite imagery, thousands of in-situ sensors, glider missions, drifter tracks, oil spill alerts, and weather observations — all discovered through AQUAVIEW's federated ocean data infrastructure.</p>
             <h3>What you're seeing</h3>
-            <p><span class="hl">5,000 animated particles</span> trace ocean surface currents from satellite altimetry. Beneath them: chlorophyll-a, SST, salinity, and water clarity satellite imagery. Overlaid: ~500 IOOS sensors, 313 NDBC buoys, 140 CO-OPS tidal stations, 58 hypoxia monitoring stations with ML forecasts, 51 glider missions, 110 pollution incidents, and hurricane monitoring probes.</p>
+            <p>Animated particles trace <span class="hl">ocean surface currents</span> from satellite altimetry. IDW-interpolated heatmaps show continuous temperature and dissolved oxygen fields from hundreds of sensors. Overlaid: ~500 IOOS sensors, 313 NDBC buoys, 140 CO-OPS tidal stations, 5 USF glider missions with real ERDDAP tracks, pollution incidents, and hurricane monitoring probes.</p>
             <h3>Why it matters</h3>
             <p>The Gulf of Mexico hosts the Western Hemisphere's largest recurring <span class="hl">hypoxic dead zone</span>. By fusing real-time data from every available source through AQUAVIEW, this COP enables early warning of hypoxic events, oil spill tracking, hurricane monitoring, and ecosystem-scale situational awareness.</p>
+            <h3>Default View</h3>
+            <p>The COP opens with an operational baseline: <span class="hl">sea surface temperature</span> and <span class="hl">dissolved oxygen</span> heatmaps showing water conditions, <span class="hl">current flow</span> particles showing circulation, and <span class="hl">active glider tracks</span> showing real-time sampling missions. Toggle additional layers from the panel on the right.</p>
         </div>
 
         <div class="about-content tab-pane" id="tab-layers">
