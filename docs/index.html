@@ -449,25 +449,22 @@ function initMap() {
     }).addTo(map);
 
     // ─── WMS Satellite Layers ───
+    // CoastWatch ERDDAP requires EPSG:4326 and default (empty) styles
+    const erddapWmsOpts = { format: 'image/png', transparent: true, version: '1.1.1', crs: L.CRS.EPSG4326, styles: '' };
     leafletLayers.chlorophyll = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwS3BOLCIchlaDaily/request?', {
-        layers: 'noaacwS3BOLCIchlaDaily:chlor_a', format: 'image/png', transparent: true, opacity: 0.4,
-        styles: 'rainbow~Log', colorBarMin: 0.01, colorBarMax: 30,
+        ...erddapWmsOpts, layers: 'noaacwS3BOLCIchlaDaily:chlor_a', opacity: 0.5,
     });
     leafletLayers.sst = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwSNPPACSPOSSTL3GCDaily/request?', {
-        layers: 'noaacwSNPPACSPOSSTL3GCDaily:sea_surface_temperature', format: 'image/png', transparent: true, opacity: 0.4,
-        styles: 'rainbow~Linear', colorBarMin: 10, colorBarMax: 32,
+        ...erddapWmsOpts, layers: 'noaacwSNPPACSPOSSTL3GCDaily:sea_surface_temperature', opacity: 0.5,
     });
     leafletLayers.ssh = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwBLENDEDsshDaily/request?', {
-        layers: 'noaacwBLENDEDsshDaily:sla', format: 'image/png', transparent: true, opacity: 0.35,
-        styles: 'rainbow~Linear', colorBarMin: -0.5, colorBarMax: 0.5,
+        ...erddapWmsOpts, layers: 'noaacwBLENDEDsshDaily:sla', opacity: 0.4,
     });
     leafletLayers.salinity = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwSMOSsssDaily/request?', {
-        layers: 'noaacwSMOSsssDaily:sss', format: 'image/png', transparent: true, opacity: 0.4,
-        styles: 'rainbow~Linear', colorBarMin: 30, colorBarMax: 38,
+        ...erddapWmsOpts, layers: 'noaacwSMOSsssDaily:sss', opacity: 0.5,
     });
     leafletLayers.kd490 = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwNPPVIIRSkd490Daily/request?', {
-        layers: 'noaacwNPPVIIRSkd490Daily:kd_490', format: 'image/png', transparent: true, opacity: 0.4,
-        styles: 'rainbow~Log', colorBarMin: 0.01, colorBarMax: 5,
+        ...erddapWmsOpts, layers: 'noaacwNPPVIIRSkd490Daily:kd_490', opacity: 0.5,
     });
 
     if (layerState.chlorophyll) leafletLayers.chlorophyll.addTo(map);
