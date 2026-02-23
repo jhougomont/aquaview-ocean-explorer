@@ -224,7 +224,7 @@
     <div class="stat-chip"><span class="num" id="stat-collections">9</span><span class="lbl">collections</span></div>
     <div class="stat-chip"><span class="num" id="stat-layers">22</span><span class="lbl">layers</span></div>
     <div class="stat-chip"><span class="num" id="stat-particles">—</span><span class="lbl">particles</span></div>
-    <div class="stat-chip"><span class="num" id="stat-updated" style="color:#22c55e;cursor:help" title="">—</span><span class="lbl">updated</span></div>
+    <div class="stat-chip"><span class="num" id="stat-updated" style="color:#22c55e;cursor:help" title="">—</span><span class="lbl">updated · 2hr cycle</span></div>
 </div>
 
 <div class="current-legend" id="current-legend">
@@ -277,7 +277,7 @@
             <p>Ocean data is fragmented across agencies, formats, and access protocols. NDBC buoy data lives on one system, CO-OPS tidal stations on another, glider missions on a third, satellite products on yet another. Building a comprehensive operational picture traditionally requires writing and maintaining separate integrations for each. AQUAVIEW collapses this complexity by cataloging all sources into a uniform STAC interface with standardized metadata, bounding-box spatial queries, and direct links to source ERDDAP servers.</p>
 
             <h3>How This COP Uses AQUAVIEW</h3>
-            <p>Every 6 hours, our automated pipeline queries the AQUAVIEW STAC API with a Gulf of Mexico bounding-box filter. For each matching item, AQUAVIEW provides <code>aquaview:source_url</code> pointing to the live ERDDAP endpoint and <code>aquaview:variables</code> listing available parameters. This lets us automatically discover and fetch the latest data across all 9 collections powering this COP — without hard-coding a single data source URL.</p>
+            <p>Every 2 hours, our automated pipeline queries the AQUAVIEW STAC API with a Gulf of Mexico bounding-box filter. For each matching item, AQUAVIEW provides <code>aquaview:source_url</code> pointing to the live ERDDAP endpoint and <code>aquaview:variables</code> listing available parameters. This lets us automatically discover and fetch the latest data across all 9 collections powering this COP — without hard-coding a single data source URL.</p>
 
             <div class="data-grid" style="margin-top:16px">
                 <div class="data-card">
@@ -318,7 +318,7 @@
 
         <div class="about-content tab-pane" id="tab-layers">
             <h2>Data Layers — 22 layers across 9 collections</h2>
-            <p>All data discovered through the AQUAVIEW STAC API, pre-fetched server-side every 6 hours via GitHub Actions.</p>
+            <p>All data discovered through the AQUAVIEW STAC API, pre-fetched server-side every 2 hours via GitHub Actions.</p>
             <div class="data-grid">
                 <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#38bdf8"></span> Surface Currents</div><div class="dc-detail">CoastWatch Blended NRT • 0.25° grid daily • 5,000 particles with bilinear interpolation</div></div>
                 <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#22c55e"></span> Chlorophyll-a</div><div class="dc-detail">Sentinel-3B OLCI • 300m daily • Phytoplankton / HAB indicator</div></div>

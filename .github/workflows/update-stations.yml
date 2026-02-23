@@ -2,8 +2,8 @@ name: Update Ocean Data
 
 on:
   schedule:
-    # Every 6 hours: midnight, 6am, noon, 6pm UTC
-    - cron: '0 0,6,12,18 * * *'
+    # Every 2 hours — ~1,080 min/month on free tier (limit 2,000)
+    - cron: '0 */2 * * *'
   workflow_dispatch:  # Allow manual trigger from GitHub UI
 
 permissions:
