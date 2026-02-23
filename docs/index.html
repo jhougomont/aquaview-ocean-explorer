@@ -64,6 +64,9 @@
         .leaflet-popup-content-wrapper { background: rgba(10,14,26,0.95); color: #e0e6f0; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         .leaflet-popup-tip { background: rgba(10,14,26,0.95); }
         .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 13px; }
+        .do-label { background: none !important; border: none !important; box-shadow: none !important; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: #fff; text-shadow: 0 0 4px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.8); padding: 0 !important; }
+        .do-label::before { display: none !important; }
+        .hide-do-labels .do-label { display: none !important; }
 
         /* ─── Current Legend ─── */
         .current-legend { position: absolute; bottom: 70px; right: 16px; z-index: 1000; background: rgba(10,14,26,0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 12px; font-size: 10px; }
@@ -96,6 +99,7 @@
         .tab-pane.active { display: block; }
 
         /* Wind barb canvas */
+        #heat-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 430; }
         #wind-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 440; }
     </style>
 </head>
@@ -103,6 +107,7 @@
 
 <div id="map"></div>
 <canvas id="current-canvas"></canvas>
+<canvas id="heat-canvas"></canvas>
 <canvas id="wind-canvas"></canvas>
 
 <div class="title-bar">
@@ -114,87 +119,84 @@
 <!-- ═══════ LAYER PANEL ═══════ -->
 <div class="layer-panel" id="layer-panel">
 
-    <div class="layer-group-header" onclick="toggleGroup('currents-grp')">
-        <span class="chevron" id="chevron-currents-grp">▼</span> Ocean Currents
+    <div class="layer-group-header" onclick="toggleGroup('ocean-grp')">
+        <span class="chevron" id="chevron-ocean-grp">▼</span> Ocean Physics
     </div>
-    <div class="layer-group-body" id="grp-currents-grp">
+    <div class="layer-group-body" id="grp-ocean-grp">
         <div class="layer-toggle active" data-layer="currents" style="color:#38bdf8" onclick="toggleLayer('currents')">
-            <div class="dot"></div><span class="label">Surface Currents</span><span class="count" id="currents-status">loading</span>
+            <div class="dot"></div><span class="label">Current Flow</span><span class="count" id="currents-status">loading</span>
         </div>
-        <div class="layer-toggle" data-layer="drifters" style="color:#06b6d4" onclick="toggleLayer('drifters')">
-            <div class="dot"></div><span class="label">Global Drifters</span><span class="count" id="drifters-count">—</span>
+        <div class="layer-toggle active" data-layer="sst_heat" style="color:#f97316" onclick="toggleLayer('sst_heat')">
+            <div class="dot"></div><span class="label">Temperature</span><span class="count" id="sst-heat-count">—</span>
+        </div>
+        <div class="layer-toggle active" data-layer="water_level" style="color:#06b6d4" onclick="toggleLayer('water_level')">
+            <div class="dot"></div><span class="label">Water Level</span><span class="count" id="wl-count">—</span>
         </div>
         <div class="layer-toggle" data-layer="ssh" style="color:#a78bfa" onclick="toggleLayer('ssh')">
             <div class="dot"></div><span class="label">Sea Surface Height</span><span class="count">WMS</span>
         </div>
     </div>
 
-    <div class="layer-group-header" onclick="toggleGroup('sat-grp')">
-        <span class="chevron" id="chevron-sat-grp">▼</span> Satellite Imagery
+    <div class="layer-group-header" onclick="toggleGroup('bio-grp')">
+        <span class="chevron" id="chevron-bio-grp">▼</span> Biology & Chemistry
     </div>
-    <div class="layer-group-body" id="grp-sat-grp">
-        <div class="layer-toggle active" data-layer="chlorophyll" style="color:#22c55e" onclick="toggleLayer('chlorophyll')">
-            <div class="dot"></div><span class="label">Chlorophyll-a</span><span class="count">OLCI</span>
+    <div class="layer-group-body" id="grp-bio-grp">
+        <div class="layer-toggle active" data-layer="do_field" style="color:#22c55e" onclick="toggleLayer('do_field')">
+            <div class="dot"></div><span class="label">Dissolved Oxygen</span><span class="count" id="do-count">—</span>
         </div>
-        <div class="layer-toggle" data-layer="sst" style="color:#f97316" onclick="toggleLayer('sst')">
-            <div class="dot"></div><span class="label">Sea Surface Temp</span><span class="count">VIIRS</span>
+        <div class="layer-toggle" data-layer="chlorophyll" style="color:#34d399" onclick="toggleLayer('chlorophyll')">
+            <div class="dot"></div><span class="label">Chlorophyll-a</span><span class="count">satellite</span>
         </div>
         <div class="layer-toggle" data-layer="salinity" style="color:#818cf8" onclick="toggleLayer('salinity')">
-            <div class="dot"></div><span class="label">Sea Surface Salinity</span><span class="count">SMOS</span>
+            <div class="dot"></div><span class="label">Salinity</span><span class="count">satellite</span>
         </div>
         <div class="layer-toggle" data-layer="kd490" style="color:#67e8f9" onclick="toggleLayer('kd490')">
-            <div class="dot"></div><span class="label">Water Clarity (Kd490)</span><span class="count">VIIRS</span>
-        </div>
-    </div>
-
-    <div class="layer-group-header" onclick="toggleGroup('sensor-grp')">
-        <span class="chevron" id="chevron-sensor-grp">▼</span> In-Situ Sensors
-    </div>
-    <div class="layer-group-body" id="grp-sensor-grp">
-        <div class="layer-toggle active" data-layer="ndbc" style="color:#facc15" onclick="toggleLayer('ndbc')">
-            <div class="dot"></div><span class="label">NDBC Hypoxia</span><span class="count" id="ndbc-count">—</span>
-        </div>
-        <div class="layer-toggle active" data-layer="ndbc_met" style="color:#fbbf24" onclick="toggleLayer('ndbc_met')">
-            <div class="dot"></div><span class="label">NDBC Weather Buoys</span><span class="count" id="ndbc-met-count">—</span>
-        </div>
-        <div class="layer-toggle active" data-layer="coops" style="color:#fb7185" onclick="toggleLayer('coops')">
-            <div class="dot"></div><span class="label">CO-OPS Tidal Stations</span><span class="count" id="coops-count">—</span>
-        </div>
-        <div class="layer-toggle active" data-layer="ioos" style="color:#2dd4bf" onclick="toggleLayer('ioos')">
-            <div class="dot"></div><span class="label">IOOS Sensor Network</span><span class="count" id="ioos-count">—</span>
-        </div>
-    </div>
-
-    <div class="layer-group-header" onclick="toggleGroup('hazard-grp')">
-        <span class="chevron" id="chevron-hazard-grp">▼</span> Hazards & Events
-    </div>
-    <div class="layer-group-body" id="grp-hazard-grp">
-        <div class="layer-toggle active" data-layer="incidents" style="color:#ef4444" onclick="toggleLayer('incidents')">
-            <div class="dot"></div><span class="label">Oil Spills & Pollution</span><span class="count" id="incidents-count">—</span>
-        </div>
-        <div class="layer-toggle" data-layer="pmel" style="color:#f472b6" onclick="toggleLayer('pmel')">
-            <div class="dot"></div><span class="label">Hurricane Probes</span><span class="count" id="pmel-count">—</span>
-        </div>
-    </div>
-
-    <div class="layer-group-header" onclick="toggleGroup('sub-grp')">
-        <span class="chevron" id="chevron-sub-grp">▼</span> Subsurface
-    </div>
-    <div class="layer-group-body" id="grp-sub-grp">
-        <div class="layer-toggle active" data-layer="gliders" style="color:#c084fc" onclick="toggleLayer('gliders')">
-            <div class="dot"></div><span class="label">Glider Tracks</span><span class="count" id="glider-count">—</span>
+            <div class="dot"></div><span class="label">Water Clarity</span><span class="count">satellite</span>
         </div>
     </div>
 
     <div class="layer-group-header" onclick="toggleGroup('wx-grp')">
-        <span class="chevron" id="chevron-wx-grp">▼</span> Weather
+        <span class="chevron" id="chevron-wx-grp">▼</span> Weather & Waves
     </div>
-    <div class="layer-group-body collapsed" id="grp-wx-grp">
+    <div class="layer-group-body" id="grp-wx-grp">
         <div class="layer-toggle" data-layer="wind" style="color:#94a3b8" onclick="toggleLayer('wind')">
-            <div class="dot"></div><span class="label">Wind Barbs</span><span class="count" id="wind-count">—</span>
+            <div class="dot"></div><span class="label">Wind Field</span><span class="count" id="wind-count">—</span>
         </div>
         <div class="layer-toggle" data-layer="waves" style="color:#60a5fa" onclick="toggleLayer('waves')">
             <div class="dot"></div><span class="label">Wave Height</span><span class="count" id="wave-count">—</span>
+        </div>
+    </div>
+
+    <div class="layer-group-header" onclick="toggleGroup('hazard-grp')">
+        <span class="chevron" id="chevron-hazard-grp">▼</span> Hazards & Operations
+    </div>
+    <div class="layer-group-body" id="grp-hazard-grp">
+        <div class="layer-toggle active" data-layer="incidents" style="color:#ef4444" onclick="toggleLayer('incidents')">
+            <div class="dot"></div><span class="label">Pollution Incidents</span><span class="count" id="incidents-count">—</span>
+        </div>
+        <div class="layer-toggle active" data-layer="gliders" style="color:#c084fc" onclick="toggleLayer('gliders')">
+            <div class="dot"></div><span class="label">Glider Missions</span><span class="count" id="glider-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="pmel" style="color:#f472b6" onclick="toggleLayer('pmel')">
+            <div class="dot"></div><span class="label">Hurricane Probes</span><span class="count" id="pmel-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="drifters" style="color:#06b6d4" onclick="toggleLayer('drifters')">
+            <div class="dot"></div><span class="label">Drifter Tracks</span><span class="count" id="drifters-count">—</span>
+        </div>
+    </div>
+
+    <div class="layer-group-header" onclick="toggleGroup('raw-grp')">
+        <span class="chevron" id="chevron-raw-grp">▼</span> Station Networks
+    </div>
+    <div class="layer-group-body collapsed" id="grp-raw-grp">
+        <div class="layer-toggle" data-layer="ndbc_met" style="color:#fbbf24" onclick="toggleLayer('ndbc_met')">
+            <div class="dot"></div><span class="label">NDBC Buoys</span><span class="count" id="ndbc-met-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="ioos" style="color:#2dd4bf" onclick="toggleLayer('ioos')">
+            <div class="dot"></div><span class="label">IOOS Sensors</span><span class="count" id="ioos-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="sst" style="color:#f97316" onclick="toggleLayer('sst')">
+            <div class="dot"></div><span class="label">SST Satellite</span><span class="count">VIIRS</span>
         </div>
     </div>
 </div>
@@ -302,11 +304,11 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const PARTICLE_COUNT = 5000;
-const PARTICLE_LIFETIME = 120;
-const PARTICLE_LINE_WIDTH = 1.6;
+const PARTICLE_COUNT = 2000;
+const PARTICLE_LIFETIME = 100;
+const PARTICLE_LINE_WIDTH = 1.0;
 const SPEED_SCALE = 0.0004;
-const FADE_OPACITY = 0.975;
+const FADE_OPACITY = 0.92;
 const GULF_BOUNDS = { latMin: 18, latMax: 32, lonMin: -98, lonMax: -80 };
 const CURRENT_URL_LOCAL = 'data/currents.json?t=' + Date.now();
 const CURRENT_URL_LIVE = 'https://coastwatch.noaa.gov/erddap/griddap/noaacwBLENDEDNRTcurrentsDaily.json?u_current[(last)][(18):(32)][(-98):(-80)],v_current[(last)][(18):(32)][(-98):(-80)]';
@@ -314,18 +316,19 @@ const CURRENT_URL_LIVE = 'https://coastwatch.noaa.gov/erddap/griddap/noaacwBLEND
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
-let map, canvas, ctx, windCanvas, windCtx;
+let map, canvas, ctx, windCanvas, windCtx, heatCanvas, heatCtx;
 let currentGrid = null;
 let particles = [];
 let animRunning = true;
 let layerState = {
-    currents: true, drifters: false, ssh: false,
-    chlorophyll: true, sst: false, salinity: false, kd490: false,
-    ndbc: true, ndbc_met: true, coops: true, ioos: true,
-    incidents: true, pmel: false,
-    gliders: true,
+    currents: true, ssh: false, drifters: false,
+    sst_heat: true, water_level: true, do_field: true,
+    chlorophyll: false, sst: false, salinity: false, kd490: false,
+    ndbc_met: false, ioos: false,
+    incidents: true, pmel: false, gliders: true,
     wind: false, waves: false
 };
+// Internal: ndbc layer always loads (feeds DO field) but has no separate toggle
 let leafletLayers = {};
 let totalSensors = 0;
 let ndbcMetData = null;  // Cache for wind/wave rendering
@@ -396,16 +399,23 @@ function initMap() {
     // Canvas
     canvas = document.getElementById('current-canvas');
     ctx = canvas.getContext('2d');
+    heatCanvas = document.getElementById('heat-canvas');
+    heatCtx = heatCanvas.getContext('2d');
     windCanvas = document.getElementById('wind-canvas');
     windCtx = windCanvas.getContext('2d');
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    map.on('move zoom moveend zoomend', () => { clearCanvas(); renderWindBarbs(); renderWaveCircles(); });
+    map.on('move zoom moveend zoomend', () => {
+        clearCanvas(); renderHeatmaps(); renderWindBarbs(); renderWaveCircles();
+        // Show DO labels only at zoom >= 8
+        const mc = document.querySelector('.leaflet-map-pane');
+        if (mc) { if (map.getZoom() < 8) mc.classList.add('hide-do-labels'); else mc.classList.remove('hide-do-labels'); }
+    });
 }
 
 function resizeCanvas() {
-    canvas.width = windCanvas.width = window.innerWidth;
-    canvas.height = windCanvas.height = window.innerHeight;
+    canvas.width = heatCanvas.width = windCanvas.width = window.innerWidth;
+    canvas.height = heatCanvas.height = windCanvas.height = window.innerHeight;
 }
 function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
@@ -485,10 +495,10 @@ function spawnParticle() {
 }
 function speedColor(speed) {
     const t = Math.min(speed / 0.5, 1);
-    if (t < 0.25) { const s = t/0.25; return `rgba(${60+100*s},${100+120*s},${160+90*s},0.9)`; }
-    else if (t < 0.5) { const s = (t-0.25)/0.25; return `rgba(${160-30*s},220,${250-10*s},1.0)`; }
-    else if (t < 0.75) { const s = (t-0.5)/0.25; return `rgba(${130+120*s},${220-80*s},${240-100*s},1.0)`; }
-    else { const s = (t-0.75)/0.25; return `rgba(250,${140+60*s},${140-80*s},1.0)`; }
+    if (t < 0.25) { const s = t/0.25; return `rgba(${60+100*s},${100+120*s},${160+90*s},0.45)`; }
+    else if (t < 0.5) { const s = (t-0.25)/0.25; return `rgba(${160-30*s},220,${250-10*s},0.55)`; }
+    else if (t < 0.75) { const s = (t-0.5)/0.25; return `rgba(${130+120*s},${220-80*s},${240-100*s},0.65)`; }
+    else { const s = (t-0.75)/0.25; return `rgba(250,${140+60*s},${140-80*s},0.8)`; }
 }
 function animateParticles() {
     if (!animRunning || !layerState.currents || !currentGrid) { requestAnimationFrame(animateParticles); return; }
@@ -508,7 +518,7 @@ function animateParticles() {
         const pt = map.latLngToContainerPoint([newLat, newLon]);
         if (p.prevX !== null) {
             ctx.beginPath(); ctx.moveTo(p.prevX, p.prevY); ctx.lineTo(pt.x, pt.y);
-            ctx.strokeStyle = speedColor(speed); ctx.lineWidth = lineWidth + speed * 2;
+            ctx.strokeStyle = speedColor(speed); ctx.lineWidth = lineWidth + speed * 1;
             ctx.lineCap = 'round'; ctx.stroke();
         }
         p.prevX = pt.x; p.prevY = pt.y; p.lat = newLat; p.lon = newLon;
@@ -543,8 +553,19 @@ async function loadNDBCHypoxia() {
             const temp = s.current && s.current.temp != null ? s.current.temp.toFixed(1) + '°C' : '—';
             const sal = s.current && s.current.sal != null ? s.current.sal.toFixed(1) + ' psu' : '—';
             const doVal = hasDO ? s.current.do.toFixed(2) + ' mg/L' : '—';
-            const color = hasDO && s.current.do <= 2 ? '#ef4444' : hasDO && s.current.do <= 4 ? '#f59e0b' : hasModel ? '#facc15' : '#94a3b8';
-            const marker = L.circleMarker([s.lat, s.lon], { radius: hasModel ? 7 : 5, color, fillColor: color, fillOpacity: 0.8, weight: hasModel ? 2 : 1 }).addTo(group);
+            // Data-driven color: red=hypoxic(<2), orange=stressed(2-4), yellow=watch(4-6), green=ok(>6)
+            const color = hasDO && s.current.do <= 2 ? '#ef4444' : hasDO && s.current.do <= 4 ? '#f59e0b' : hasDO && s.current.do <= 6 ? '#facc15' : hasDO ? '#22c55e' : hasModel ? '#a78bfa' : '#64748b';
+            // Data-driven size: bigger markers for low-DO (high risk) stations
+            const radius = hasDO && s.current.do <= 2 ? 12 : hasDO && s.current.do <= 4 ? 10 : hasModel ? 7 : 5;
+            const weight = hasDO && s.current.do <= 4 ? 2.5 : hasModel ? 2 : 1;
+            const marker = L.circleMarker([s.lat, s.lon], { radius, color, fillColor: color, fillOpacity: hasDO ? 0.85 : 0.5, weight }).addTo(group);
+            // Add DO value label as a tooltip visible at zoom >= 8
+            if (hasDO) {
+                marker.bindTooltip(s.current.do.toFixed(1), {
+                    permanent: true, direction: 'center', className: 'do-label',
+                    offset: [0, -14]
+                });
+            }
             const engine = s.model_type === 'timesfm' ? '<span style="color:#c084fc">TimesFM</span>' : s.model_type === 'xgboost' ? '<span style="color:#60a5fa">XGBoost</span>' : '';
             let predHTML = '';
             if (s.predictions && Object.keys(s.predictions).length > 0) {
@@ -563,8 +584,15 @@ async function loadNDBCHypoxia() {
                 DO: <span style="color:${hasDO && s.current.do <= 2 ? '#ef4444' : '#22c55e'}">${doVal}</span></div>${predHTML}`);
         });
         leafletLayers.ndbc = group;
-        if (layerState.ndbc) group.addTo(map);
-        setCount('ndbc-count', count); totalSensors += count;
+        if (layerState.do_field) group.addTo(map);  // DO field shows hypoxia markers
+        // Feed unified data arrays
+        data.stations.forEach(s => {
+            if (!s.lat || !s.lon || !s.current) return;
+            if (s.current.temp != null) allTempPoints.push({ lat: s.lat, lon: s.lon, val: s.current.temp });
+            if (s.current.do != null) allDOPoints.push({ lat: s.lat, lon: s.lon, val: s.current.do });
+        });
+        setCount('do-count', allDOPoints.length + ' pts');
+        totalSensors += count;
         return count;
     } catch (e) { console.error('NDBC hypoxia load failed:', e); return 0; }
 }
@@ -581,8 +609,14 @@ async function loadNDBCMet() {
         (data.buoys || []).forEach(b => {
             if (!b.lat || !b.lon) return; count++;
             const c = b.current || {};
+            // Color by SST: cool blue → warm orange → hot red
+            const hasSST = c.wtmp != null;
+            const sstColor = hasSST ? (c.wtmp < 18 ? '#3b82f6' : c.wtmp < 22 ? '#38bdf8' : c.wtmp < 26 ? '#fbbf24' : c.wtmp < 29 ? '#f97316' : '#ef4444') : '#fbbf24';
+            // Size by wind speed
+            const hasWind = c.wspd != null;
+            const wRadius = hasWind ? 4 + Math.min(c.wspd * 0.4, 5) : 4;
             const marker = L.circleMarker([b.lat, b.lon], {
-                radius: 4, color: '#fbbf24', fillColor: '#fbbf24', fillOpacity: 0.5, weight: 1
+                radius: wRadius, color: sstColor, fillColor: sstColor, fillOpacity: hasSST ? 0.7 : 0.4, weight: 1
             }).addTo(group);
             const wspd = c.wspd != null ? c.wspd.toFixed(1) + ' m/s' : '—';
             const wdir = c.wdir != null ? c.wdir + '°' : '—';
@@ -600,6 +634,12 @@ async function loadNDBCMet() {
         });
         leafletLayers.ndbc_met = group;
         if (layerState.ndbc_met) group.addTo(map);
+        // Feed unified temp array from SST data
+        (data.buoys || []).forEach(b => {
+            if (b.lat && b.lon && (b.current || {}).wtmp != null)
+                allTempPoints.push({ lat: b.lat, lon: b.lon, val: b.current.wtmp });
+        });
+        setCount('sst-heat-count', allTempPoints.length + ' pts');
         setCount('ndbc-met-count', count); totalSensors += count;
         return count;
     } catch (e) { console.error('NDBC met load failed:', e); return 0; }
@@ -615,18 +655,29 @@ async function loadCOOPS() {
         const group = L.layerGroup(); let count = 0;
         (data.stations || []).forEach(s => {
             if (!s.lat || !s.lon) return; count++;
+            const hasWL = s.current && s.current.wl != null;
+            const wl = hasWL ? s.current.wl : 0;
+            // Color by water level: deep blue (low) → cyan (mid) → orange (high tide)
+            const wlColor = hasWL ? (wl < -0.3 ? '#3b82f6' : wl < 0 ? '#38bdf8' : wl < 0.3 ? '#06b6d4' : wl < 0.6 ? '#f59e0b' : '#ef4444') : '#fb7185';
+            const radius = hasWL ? 5 + Math.min(Math.abs(wl) * 6, 5) : 4;
             const marker = L.circleMarker([s.lat, s.lon], {
-                radius: 4, color: '#fb7185', fillColor: '#fb7185', fillOpacity: 0.6, weight: 1
+                radius, color: wlColor, fillColor: wlColor, fillOpacity: hasWL ? 0.75 : 0.4, weight: 1.5
             }).addTo(group);
-            const wl = s.current && s.current.wl != null ? s.current.wl.toFixed(2) + ' m' : '—';
+            const wlStr = hasWL ? wl.toFixed(2) + ' m' : '—';
             marker.bindPopup(`<div style="font-weight:600;font-size:13px">${s.title || s.id}</div>
                 <div style="color:#94a3b8;font-size:11px">CO-OPS ${s.id}</div>
-                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:6px">Water Level: <span style="color:#fb7185">${wl}</span> MLLW</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:6px">Water Level: <span style="color:${wlColor}">${wlStr}</span> MLLW</div>
                 <div style="color:#64748b;font-size:10px;margin-top:4px">Vars: ${(s.vars||[]).slice(0,4).join(', ')}</div>`);
         });
         leafletLayers.coops = group;
-        if (layerState.coops) group.addTo(map);
-        setCount('coops-count', count); totalSensors += count;
+        if (layerState.water_level) group.addTo(map);  // Water level shows CO-OPS markers
+        // Feed unified water level array
+        (data.stations || []).forEach(s => {
+            if (s.lat && s.lon && (s.current || {}).wl != null)
+                allWLPoints.push({ lat: s.lat, lon: s.lon, val: s.current.wl });
+        });
+        setCount('wl-count', allWLPoints.length + ' pts');
+        totalSensors += count;
         return count;
     } catch (e) { console.error('CO-OPS load failed:', e); return 0; }
 }
@@ -771,6 +822,107 @@ async function loadDrifters() {
 }
 
 // ═══════════════════════════════════════════════════════════
+// UNIFIED IDW HEATMAP RENDERER (for any variable)
+// Merges data across all sources into spatial fields
+// ═══════════════════════════════════════════════════════════
+let allTempPoints = [];   // {lat,lon,val} from NDBC hypoxia + NDBC met
+let allDOPoints = [];     // {lat,lon,val} from NDBC hypoxia
+let allWLPoints = [];     // {lat,lon,val} from CO-OPS
+
+function idwColormap(val, vmin, vmax, scheme) {
+    const t = Math.max(0, Math.min(1, (val - vmin) / (vmax - vmin)));
+    let r, g, b;
+    if (scheme === 'thermal') {
+        // Cool blue → cyan → yellow → orange → red
+        if (t < 0.2)      { const s=t/0.2;     r=30+50*s;   g=50+120*s;  b=180+50*s; }
+        else if (t < 0.4) { const s=(t-0.2)/0.2; r=80-30*s;  g=170+50*s;  b=230-150*s; }
+        else if (t < 0.6) { const s=(t-0.4)/0.2; r=50+180*s; g=220;       b=80-60*s; }
+        else if (t < 0.8) { const s=(t-0.6)/0.2; r=230+20*s; g=220-100*s; b=20-10*s; }
+        else               { const s=(t-0.8)/0.2; r=250;      g=120-70*s;  b=10+20*s; }
+    } else if (scheme === 'oxygen') {
+        // Red (hypoxic) → orange → yellow → green (healthy)
+        if (t < 0.25)      { const s=t/0.25;     r=220;       g=40+60*s;   b=40; }
+        else if (t < 0.5)  { const s=(t-0.25)/0.25; r=220+30*s; g=100+80*s;  b=40; }
+        else if (t < 0.75) { const s=(t-0.5)/0.25; r=250-120*s; g=180+40*s;  b=40+30*s; }
+        else                { const s=(t-0.75)/0.25; r=130-80*s;  g=220;       b=70+50*s; }
+    } else if (scheme === 'tidal') {
+        // Deep blue → cyan → white → amber
+        if (t < 0.3)      { const s=t/0.3;     r=20+30*s;   g=60+100*s;  b=180+40*s; }
+        else if (t < 0.5) { const s=(t-0.3)/0.2; r=50+60*s;  g=160+60*s;  b=220-40*s; }
+        else if (t < 0.7) { const s=(t-0.5)/0.2; r=110+90*s; g=220-20*s;  b=180-80*s; }
+        else               { const s=(t-0.7)/0.3; r=200+50*s; g=200-80*s;  b=100-60*s; }
+    }
+    return [Math.round(r), Math.round(g), Math.round(b)];
+}
+
+function renderHeatmaps() {
+    heatCtx.clearRect(0, 0, heatCanvas.width, heatCanvas.height);
+    // Determine which heatmaps to render
+    const jobs = [];
+    if (layerState.sst_heat && allTempPoints.length >= 3) {
+        jobs.push({ pts: allTempPoints, vmin: 14, vmax: 30, scheme: 'thermal', maxDist: 350, baseAlpha: 0.40 });
+    }
+    if (layerState.do_field && allDOPoints.length >= 2) {
+        jobs.push({ pts: allDOPoints, vmin: 0, vmax: 10, scheme: 'oxygen', maxDist: 250, baseAlpha: 0.45 });
+    }
+    if (layerState.water_level && allWLPoints.length >= 3) {
+        jobs.push({ pts: allWLPoints, vmin: -0.5, vmax: 1.0, scheme: 'tidal', maxDist: 200, baseAlpha: 0.35 });
+    }
+    if (jobs.length === 0) return;
+
+    const w = heatCanvas.width, h = heatCanvas.height;
+    const cellSize = 10;
+    const pw = 2;  // IDW power parameter
+    const imgData = heatCtx.createImageData(w, h);
+    const pixels = imgData.data;
+
+    for (const job of jobs) {
+        // Pre-compute screen coords
+        const screenPts = job.pts.map(p => {
+            const sp = map.latLngToContainerPoint([p.lat, p.lon]);
+            return { x: sp.x, y: sp.y, v: p.val };
+        }).filter(p => p.x > -500 && p.x < w + 500 && p.y > -500 && p.y < h + 500);
+        if (screenPts.length < 2) continue;
+
+        for (let sy = 0; sy < h; sy += cellSize) {
+            for (let sx = 0; sx < w; sx += cellSize) {
+                let wSum = 0, vSum = 0, minDist = Infinity;
+                for (const p of screenPts) {
+                    const dx = sx - p.x, dy = sy - p.y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < minDist) minDist = d;
+                    if (d < 1) { wSum = 1; vSum = p.v; break; }
+                    const wt = 1 / Math.pow(d, pw);
+                    wSum += wt; vSum += wt * p.v;
+                }
+                if (minDist > job.maxDist || wSum === 0) continue;
+                const val = vSum / wSum;
+                const [cr, cg, cb] = idwColormap(val, job.vmin, job.vmax, job.scheme);
+                const alpha = Math.max(0, Math.min(job.baseAlpha, (1 - minDist / job.maxDist) * (job.baseAlpha + 0.1)));
+                for (let cy = sy; cy < Math.min(sy + cellSize, h); cy++) {
+                    for (let cx = sx; cx < Math.min(sx + cellSize, w); cx++) {
+                        const idx = (cy * w + cx) * 4;
+                        // Alpha-blend additive (multiple heatmaps can overlap)
+                        const a = alpha * 255;
+                        const existing = pixels[idx + 3];
+                        if (existing === 0) {
+                            pixels[idx] = cr; pixels[idx+1] = cg; pixels[idx+2] = cb; pixels[idx+3] = Math.round(a);
+                        } else {
+                            const blend = a / (existing + a);
+                            pixels[idx]   = Math.round(pixels[idx]   * (1-blend) + cr * blend);
+                            pixels[idx+1] = Math.round(pixels[idx+1] * (1-blend) + cg * blend);
+                            pixels[idx+2] = Math.round(pixels[idx+2] * (1-blend) + cb * blend);
+                            pixels[idx+3] = Math.min(255, Math.round(existing + a * 0.5));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    heatCtx.putImageData(imgData, 0, 0);
+}
+
+// ═══════════════════════════════════════════════════════════
 // WIND BARBS (Canvas overlay from NDBC met data)
 // ═══════════════════════════════════════════════════════════
 function renderWindBarbs() {
@@ -890,8 +1042,18 @@ function toggleLayer(name) {
     const el = document.querySelector(`.layer-toggle[data-layer="${name}"]`);
     if (el) el.classList.toggle('active', layerState[name]);
 
+    // Canvas layers (re-render)
     if (name === 'currents') {
         if (!layerState.currents) clearCanvas();
+    } else if (name === 'sst_heat' || name === 'do_field' || name === 'water_level') {
+        renderHeatmaps();
+        // Also toggle associated marker layers
+        if (name === 'do_field' && leafletLayers.ndbc) {
+            if (layerState.do_field) leafletLayers.ndbc.addTo(map); else map.removeLayer(leafletLayers.ndbc);
+        }
+        if (name === 'water_level' && leafletLayers.coops) {
+            if (layerState.water_level) leafletLayers.coops.addTo(map); else map.removeLayer(leafletLayers.coops);
+        }
     } else if (name === 'wind') {
         renderWindBarbs();
     } else if (name === 'waves') {
@@ -936,7 +1098,8 @@ async function init() {
         requestAnimationFrame(animateParticles);
     }
 
-    // Render wind/waves if enabled
+    // Render spatial data layers
+    renderHeatmaps();
     renderWindBarbs();
     renderWaveCircles();
 
