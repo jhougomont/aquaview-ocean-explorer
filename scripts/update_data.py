@@ -36,7 +36,7 @@ IOOS_SENSORS_JSON = DOCS_DATA / "ioos_sensors.json"
 NDBC_MET_JSON = DOCS_DATA / "ndbc_met.json"
 COOPS_JSON = DOCS_DATA / "coops.json"
 GLIDERS_JSON = DOCS_DATA / "gliders.json"
-DRIFTERS_JSON = DOCS_DATA / "drifters.json"
+# DRIFTERS_JSON removed — GDP ERDDAP unreliable for real-time Gulf data
 INCIDENTS_JSON = DOCS_DATA / "incidents.json"
 PMEL_JSON = DOCS_DATA / "pmel.json"
 
@@ -780,13 +780,7 @@ def main():
     except Exception as e:
         print(f"  ERROR in gliders: {e}")
 
-    # 7. NEW: Drifters
-    try:
-        update_drifters()
-    except Exception as e:
-        print(f"  ERROR in drifters: {e}")
-
-    # 8. NEW: Incidents
+    # 7. Incidents
     try:
         update_incidents()
     except Exception as e:

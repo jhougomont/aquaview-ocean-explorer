@@ -200,9 +200,6 @@
         <div class="layer-toggle" data-layer="pmel" style="color:#f472b6" onclick="toggleLayer('pmel')">
             <div class="dot"></div><span class="label">Hurricane Probes</span><span class="count" id="pmel-count">—</span>
         </div>
-        <div class="layer-toggle" data-layer="drifters" style="color:#06b6d4" onclick="toggleLayer('drifters')">
-            <div class="dot"></div><span class="label">Drifter Tracks</span><span class="count" id="drifters-count">—</span>
-        </div>
     </div>
 
     <div class="layer-group-header" onclick="toggleGroup('raw-grp')">
@@ -282,7 +279,7 @@
             <div class="data-grid" style="margin-top:16px">
                 <div class="data-card">
                     <div class="dc-title"><span class="dc-dot" style="background:#38bdf8"></span> 24+ Collections</div>
-                    <div class="dc-detail">NDBC, CO-OPS, IOOS, CoastWatch, PMEL, Gliders, Incidents, Drifters, and more — all searchable from one endpoint</div>
+                    <div class="dc-detail">NDBC, CO-OPS, IOOS, CoastWatch, PMEL, Gliders, Incidents, and more — all searchable from one endpoint</div>
                 </div>
                 <div class="data-card">
                     <div class="dc-title"><span class="dc-dot" style="background:#22c55e"></span> STAC Standard</div>
@@ -307,7 +304,7 @@
 
         <div class="about-content tab-pane" id="tab-overview">
             <h2>Gulf Ocean Intelligence COP</h2>
-            <p>The <span class="hl">ultimate Common Operating Picture</span> for the Gulf of Mexico — bringing together <span class="hl">22 real-time layers</span> across 9 AQUAVIEW data collections into a single visualization. Surface currents, satellite imagery, thousands of in-situ sensors, glider missions, drifter tracks, oil spill alerts, and weather observations — all discovered through AQUAVIEW's federated ocean data infrastructure.</p>
+            <p>The <span class="hl">ultimate Common Operating Picture</span> for the Gulf of Mexico — bringing together <span class="hl">22 real-time layers</span> across 9 AQUAVIEW data collections into a single visualization. Surface currents, satellite imagery, thousands of in-situ sensors, glider missions, oil spill alerts, and weather observations — all discovered through AQUAVIEW's federated ocean data infrastructure.</p>
             <h3>What you're seeing</h3>
             <p>Animated particles trace <span class="hl">ocean surface currents</span> from satellite altimetry. IDW-interpolated heatmaps show continuous temperature and dissolved oxygen fields from hundreds of sensors. Overlaid: ~500 IOOS sensors, 313 NDBC buoys, 140 CO-OPS tidal stations, 5 USF glider missions with real ERDDAP tracks, pollution incidents, and hurricane monitoring probes.</p>
             <h3>Why it matters</h3>
@@ -399,7 +396,7 @@ let currentGrid = null;
 let particles = [];
 let animRunning = true;
 let layerState = {
-    currents: true, ssh: false, drifters: false,
+    currents: true, ssh: false,
     sst_heat: true, water_level: false, do_field: true,
     chlorophyll: false, sst: false, salinity: false, kd490: false,
     ndbc_met: false, ioos: false,
@@ -460,16 +457,16 @@ function initMap() {
         layers: 'noaacwSNPPACSPOSSTL3GCDaily:sea_surface_temperature', format: 'image/png', transparent: true, opacity: 0.4,
         styles: 'rainbow~Linear', colorBarMin: 10, colorBarMax: 32,
     });
-    leafletLayers.ssh = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwBLENDEDNRTcurrentsDaily/request?', {
-        layers: 'noaacwBLENDEDNRTcurrentsDaily:ssh', format: 'image/png', transparent: true, opacity: 0.35,
+    leafletLayers.ssh = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwBLENDEDsshDaily/request?', {
+        layers: 'noaacwBLENDEDsshDaily:sla', format: 'image/png', transparent: true, opacity: 0.35,
         styles: 'rainbow~Linear', colorBarMin: -0.5, colorBarMax: 0.5,
     });
     leafletLayers.salinity = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwSMOSsssDaily/request?', {
         layers: 'noaacwSMOSsssDaily:sss', format: 'image/png', transparent: true, opacity: 0.4,
         styles: 'rainbow~Linear', colorBarMin: 30, colorBarMax: 38,
     });
-    leafletLayers.kd490 = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwVIIRSSNPPkd490Daily/request?', {
-        layers: 'noaacwVIIRSSNPPkd490Daily:kd_490', format: 'image/png', transparent: true, opacity: 0.4,
+    leafletLayers.kd490 = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwNPPVIIRSkd490Daily/request?', {
+        layers: 'noaacwNPPVIIRSkd490Daily:kd_490', format: 'image/png', transparent: true, opacity: 0.4,
         styles: 'rainbow~Log', colorBarMin: 0.01, colorBarMax: 5,
     });
 
@@ -926,32 +923,6 @@ async function loadPMEL() {
     } catch (e) { console.error('PMEL load failed:', e); return 0; }
 }
 
-// --- Drifters ---
-async function loadDrifters() {
-    try {
-        const r = await fetch('data/drifters.json?t=' + Date.now());
-        if (!r.ok) return 0;
-        const data = await r.json();
-        const group = L.layerGroup(); let count = 0;
-        const colors = ['#06b6d4','#0ea5e9','#22d3ee','#67e8f9'];
-        (data.drifters || []).forEach((d, i) => {
-            if (!d.track || d.track.length === 0) return; count++;
-            const latLngs = d.track.map(c => [c[1], c[0]]);
-            if (latLngs.length > 1) {
-                L.polyline(latLngs, { color: colors[i % colors.length], weight: 2, opacity: 0.5 }).addTo(group);
-            }
-            const last = latLngs[latLngs.length - 1];
-            L.circleMarker(last, { radius: 4, color: colors[i % colors.length], fillColor: colors[i % colors.length], fillOpacity: 0.8, weight: 1 }).addTo(group)
-                .bindPopup(`<div style="font-weight:600;font-size:13px">${d.title || d.id}</div>
-                    <div style="color:#94a3b8;font-size:11px">${d.count || 0} positions</div>`);
-        });
-        leafletLayers.drifters = group;
-        if (layerState.drifters) group.addTo(map);
-        setCount('drifters-count', count);
-        return count;
-    } catch (e) { console.error('Drifters load failed:', e); return 0; }
-}
-
 // ═══════════════════════════════════════════════════════════
 // UNIFIED IDW HEATMAP RENDERER (for any variable)
 // Merges data across all sources into spatial fields
@@ -1231,7 +1202,6 @@ async function init() {
         loadGliders(),
         loadIncidents(),
         loadPMEL(),
-        loadDrifters(),
     ]);
 
     setCount('stat-sensors', totalSensors.toLocaleString());
