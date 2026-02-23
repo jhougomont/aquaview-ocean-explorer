@@ -8,467 +8,203 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            background: #0a0e1a;
-            color: #e0e6f0;
-            font-family: 'Inter', sans-serif;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        #map {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 1;
-        }
-
-        #current-canvas {
-            position: absolute;
-            top: 0; left: 0;
-            pointer-events: none;
-            z-index: 450;
-        }
+        body { background: #0a0e1a; color: #e0e6f0; font-family: 'Inter', sans-serif; overflow: hidden; height: 100vh; width: 100vw; }
+        #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
+        #current-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 450; }
 
         /* ─── Title Bar ─── */
-        .title-bar {
-            position: absolute;
-            top: 16px;
-            left: 60px;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .title-bar h1 {
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            color: #fff;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
-        }
-        .title-bar .badge {
-            font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #38bdf8;
-            background: rgba(56,189,248,0.15);
-            border: 1px solid rgba(56,189,248,0.3);
-            padding: 3px 10px;
-            border-radius: 20px;
-        }
-        .title-bar .about-btn {
-            font-size: 11px;
-            font-weight: 500;
-            color: #94a3b8;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            padding: 5px 14px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-        .title-bar .about-btn:hover {
-            color: #e0e6f0;
-            background: rgba(255,255,255,0.12);
-            border-color: rgba(255,255,255,0.2);
-        }
+        .title-bar { position: absolute; top: 16px; left: 60px; z-index: 1000; display: flex; align-items: center; gap: 12px; }
+        .title-bar h1 { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+        .title-bar .badge { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.3); padding: 3px 10px; border-radius: 20px; }
+        .title-bar .about-btn { font-size: 11px; font-weight: 500; color: #94a3b8; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); padding: 5px 14px; border-radius: 20px; cursor: pointer; transition: all 0.2s; text-decoration: none; }
+        .title-bar .about-btn:hover { color: #e0e6f0; background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.2); }
 
         /* ─── Layer Panel ─── */
-        .layer-panel {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            z-index: 1000;
-            background: rgba(10, 14, 26, 0.92);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            padding: 16px;
-            width: 260px;
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-        }
-        .layer-panel h3 {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #64748b;
-            margin-bottom: 10px;
-            margin-top: 14px;
-        }
-        .layer-panel h3:first-child { margin-top: 0; }
+        .layer-panel { position: absolute; top: 16px; right: 16px; z-index: 1000; background: rgba(10, 14, 26, 0.92); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px 14px; width: 270px; max-height: calc(100vh - 100px); overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .layer-panel::-webkit-scrollbar { width: 4px; }
+        .layer-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
 
-        .layer-toggle {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 6px 0;
-            cursor: pointer;
-            font-size: 13px;
-            transition: opacity 0.15s;
+        .layer-group-header {
+            font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+            color: #64748b; padding: 8px 0 4px; margin-top: 6px; cursor: pointer;
+            display: flex; align-items: center; gap: 6px; user-select: none;
         }
+        .layer-group-header:first-child { margin-top: 0; }
+        .layer-group-header .chevron { transition: transform 0.2s; font-size: 8px; }
+        .layer-group-header .chevron.collapsed { transform: rotate(-90deg); }
+        .layer-group-header:hover { color: #94a3b8; }
+        .layer-group-body { overflow: hidden; transition: max-height 0.25s ease; }
+        .layer-group-body.collapsed { max-height: 0 !important; }
+
+        .layer-toggle { display: flex; align-items: center; gap: 8px; padding: 4px 0; cursor: pointer; font-size: 12px; transition: opacity 0.15s; }
         .layer-toggle:hover { opacity: 0.8; }
-        .layer-toggle .dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-            border: 2px solid currentColor;
-            transition: all 0.15s;
-        }
-        .layer-toggle.active .dot {
-            background: currentColor;
-            box-shadow: 0 0 8px currentColor;
-        }
+        .layer-toggle .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; border: 2px solid currentColor; transition: all 0.15s; }
+        .layer-toggle.active .dot { background: currentColor; box-shadow: 0 0 6px currentColor; }
         .layer-toggle .label { flex: 1; }
-        .layer-toggle .count {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
-            color: #64748b;
-        }
+        .layer-toggle .count { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #64748b; }
 
         /* ─── Stats Bar ─── */
-        .stats-bar {
-            position: absolute;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: flex;
-            gap: 2px;
-            background: rgba(10,14,26,0.88);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 10px;
-            padding: 4px;
-        }
-        .stat-chip {
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-        .stat-chip .num {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 600;
-            font-size: 14px;
-        }
-        .stat-chip .lbl {
-            color: #94a3b8;
-            font-size: 11px;
-        }
+        .stats-bar { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 2px; background: rgba(10,14,26,0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 4px; }
+        .stat-chip { padding: 6px 12px; border-radius: 8px; font-size: 11px; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+        .stat-chip .num { font-family: 'JetBrains Mono', monospace; font-weight: 600; font-size: 13px; }
+        .stat-chip .lbl { color: #94a3b8; font-size: 10px; }
 
-        /* ─── Loading Overlay ─── */
-        .loading-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 2000;
-            background: #0a0e1a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.8s;
-        }
-        .loading-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-        .loading-text {
-            font-size: 14px;
-            color: #64748b;
-            margin-top: 20px;
-        }
-        .loading-bar {
-            width: 200px;
-            height: 3px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 2px;
-            margin-top: 12px;
-            overflow: hidden;
-        }
-        .loading-bar .fill {
-            height: 100%;
-            width: 30%;
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-            border-radius: 2px;
-            animation: loadSlide 1.2s ease-in-out infinite;
-        }
-        @keyframes loadSlide {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(400%); }
-        }
+        /* ─── Loading ─── */
+        .loading-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 2000; background: #0a0e1a; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s; }
+        .loading-overlay.hidden { opacity: 0; pointer-events: none; }
+        .loading-text { font-size: 14px; color: #64748b; margin-top: 20px; }
+        .loading-bar { width: 200px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 12px; overflow: hidden; }
+        .loading-bar .fill { height: 100%; width: 30%; background: linear-gradient(90deg, #38bdf8, #818cf8); border-radius: 2px; animation: loadSlide 1.2s ease-in-out infinite; }
+        @keyframes loadSlide { 0% { transform: translateX(-100%); } 100% { transform: translateX(400%); } }
 
         /* ─── Leaflet Overrides ─── */
         .leaflet-control-zoom { display: none; }
-        .leaflet-control-attribution {
-            background: rgba(10,14,26,0.7) !important;
-            color: #475569 !important;
-            font-size: 10px !important;
-        }
+        .leaflet-control-attribution { background: rgba(10,14,26,0.7) !important; color: #475569 !important; font-size: 10px !important; }
         .leaflet-control-attribution a { color: #64748b !important; }
-
-        .leaflet-popup-content-wrapper {
-            background: rgba(10,14,26,0.95);
-            color: #e0e6f0;
-            border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-        }
+        .leaflet-popup-content-wrapper { background: rgba(10,14,26,0.95); color: #e0e6f0; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
         .leaflet-popup-tip { background: rgba(10,14,26,0.95); }
         .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 13px; }
 
-        /* ─── Current Speed Legend ─── */
-        .current-legend {
-            position: absolute;
-            bottom: 80px;
-            right: 16px;
-            z-index: 1000;
-            background: rgba(10,14,26,0.88);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
-            padding: 10px 14px;
-            font-size: 11px;
-        }
-        .current-legend .title {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #94a3b8;
-            font-size: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-        .current-legend .bar {
-            height: 8px;
-            width: 120px;
-            border-radius: 4px;
-            margin: 4px 0;
-        }
-        .current-legend .labels {
-            display: flex;
-            justify-content: space-between;
-            color: #64748b;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 10px;
-        }
+        /* ─── Current Legend ─── */
+        .current-legend { position: absolute; bottom: 70px; right: 16px; z-index: 1000; background: rgba(10,14,26,0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 8px 12px; font-size: 10px; }
+        .current-legend .title { font-weight: 600; margin-bottom: 4px; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; }
+        .current-legend .bar { height: 6px; width: 100px; border-radius: 3px; margin: 3px 0; }
+        .current-legend .labels { display: flex; justify-content: space-between; color: #64748b; font-family: 'JetBrains Mono', monospace; }
 
         /* ─── About Panel ─── */
-        .about-overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 3000;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(4px);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .about-overlay.visible {
-            opacity: 1;
-            pointer-events: all;
-        }
-        .about-panel {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 780px;
-            max-width: calc(100vw - 40px);
-            max-height: calc(100vh - 60px);
-            background: rgba(10, 14, 26, 0.97);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-        }
-        .about-tabs {
-            display: flex;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-        .about-tab {
-            flex: 1;
-            padding: 14px 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: #64748b;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 2px solid transparent;
-        }
+        .about-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 3000; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .about-overlay.visible { opacity: 1; pointer-events: all; }
+        .about-panel { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 800px; max-width: calc(100vw - 40px); max-height: calc(100vh - 60px); background: rgba(10, 14, 26, 0.97); border: 1px solid rgba(255,255,255,0.12); border-radius: 16px; overflow: hidden; box-shadow: 0 24px 80px rgba(0,0,0,0.6); }
+        .about-tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .about-tab { flex: 1; padding: 12px 16px; font-size: 12px; font-weight: 500; color: #64748b; text-align: center; cursor: pointer; transition: all 0.2s; border-bottom: 2px solid transparent; }
         .about-tab:hover { color: #94a3b8; background: rgba(255,255,255,0.03); }
-        .about-tab.active {
-            color: #38bdf8;
-            border-bottom-color: #38bdf8;
-            background: rgba(56,189,248,0.05);
-        }
-        .about-close {
-            position: absolute;
-            top: 10px;
-            right: 14px;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(255,255,255,0.06);
-            color: #94a3b8;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            transition: all 0.15s;
-        }
+        .about-tab.active { color: #38bdf8; border-bottom-color: #38bdf8; background: rgba(56,189,248,0.05); }
+        .about-close { position: absolute; top: 8px; right: 12px; width: 28px; height: 28px; border-radius: 50%; border: none; background: rgba(255,255,255,0.06); color: #94a3b8; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.15s; }
         .about-close:hover { background: rgba(255,255,255,0.12); color: #fff; }
-        .about-content {
-            padding: 28px 32px;
-            overflow-y: auto;
-            max-height: calc(100vh - 160px);
-            line-height: 1.7;
-        }
-        .about-content h2 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            color: #fff;
-        }
-        .about-content h3 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-top: 24px;
-            margin-bottom: 8px;
-            color: #e0e6f0;
-        }
-        .about-content p {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 14px;
-        }
-        .about-content .highlight {
-            color: #38bdf8;
-            font-weight: 500;
-        }
-        .about-content .tag {
-            display: inline-block;
-            font-size: 11px;
-            font-weight: 500;
-            padding: 3px 10px;
-            border-radius: 20px;
-            margin: 2px 4px 2px 0;
-        }
-        .about-content .data-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 16px 0;
-        }
-        .about-content .data-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 10px;
-            padding: 14px 16px;
-        }
-        .about-content .data-card .dc-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #e0e6f0;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .about-content .data-card .dc-detail {
-            font-size: 12px;
-            color: #64748b;
-            line-height: 1.5;
-        }
-        .about-content .data-card .dc-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-        }
+        .about-content { padding: 24px 28px; overflow-y: auto; max-height: calc(100vh - 160px); line-height: 1.7; }
+        .about-content h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; color: #fff; }
+        .about-content h3 { font-size: 14px; font-weight: 600; margin-top: 20px; margin-bottom: 6px; color: #e0e6f0; }
+        .about-content p { font-size: 13px; color: #94a3b8; margin-bottom: 12px; }
+        .about-content .hl { color: #38bdf8; font-weight: 500; }
+        .about-content .tag { display: inline-block; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; margin: 2px 3px 2px 0; }
+        .about-content .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 14px 0; }
+        .about-content .data-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 12px 14px; }
+        .about-content .dc-title { font-size: 12px; font-weight: 600; color: #e0e6f0; margin-bottom: 3px; display: flex; align-items: center; gap: 6px; }
+        .about-content .dc-detail { font-size: 11px; color: #64748b; line-height: 1.5; }
+        .about-content .dc-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
         .tab-pane { display: none; }
         .tab-pane.active { display: block; }
+
+        /* Wind barb canvas */
+        #wind-canvas { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 440; }
     </style>
 </head>
 <body>
 
 <div id="map"></div>
 <canvas id="current-canvas"></canvas>
+<canvas id="wind-canvas"></canvas>
 
 <div class="title-bar">
     <h1>AQUAVIEW Ocean Intelligence</h1>
-    <span class="badge">Gulf of Mexico</span>
-    <a class="about-btn" onclick="toggleAbout()">About this project</a>
+    <span class="badge">Ultimate Gulf COP</span>
+    <a class="about-btn" onclick="toggleAbout()">About</a>
 </div>
 
+<!-- ═══════ LAYER PANEL ═══════ -->
 <div class="layer-panel" id="layer-panel">
-    <h3>Ocean Currents</h3>
-    <div class="layer-toggle active" data-layer="currents" style="color: #38bdf8" onclick="toggleLayer('currents')">
-        <div class="dot"></div>
-        <span class="label">Surface Currents</span>
-        <span class="count" id="currents-status">loading</span>
+
+    <div class="layer-group-header" onclick="toggleGroup('currents-grp')">
+        <span class="chevron" id="chevron-currents-grp">▼</span> Ocean Currents
+    </div>
+    <div class="layer-group-body" id="grp-currents-grp">
+        <div class="layer-toggle active" data-layer="currents" style="color:#38bdf8" onclick="toggleLayer('currents')">
+            <div class="dot"></div><span class="label">Surface Currents</span><span class="count" id="currents-status">loading</span>
+        </div>
+        <div class="layer-toggle" data-layer="drifters" style="color:#06b6d4" onclick="toggleLayer('drifters')">
+            <div class="dot"></div><span class="label">Global Drifters</span><span class="count" id="drifters-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="ssh" style="color:#a78bfa" onclick="toggleLayer('ssh')">
+            <div class="dot"></div><span class="label">Sea Surface Height</span><span class="count">WMS</span>
+        </div>
     </div>
 
-    <h3>Satellite Imagery</h3>
-    <div class="layer-toggle active" data-layer="chlorophyll" style="color: #22c55e" onclick="toggleLayer('chlorophyll')">
-        <div class="dot"></div>
-        <span class="label">Chlorophyll-a</span>
-        <span class="count">Sentinel-3B</span>
+    <div class="layer-group-header" onclick="toggleGroup('sat-grp')">
+        <span class="chevron" id="chevron-sat-grp">▼</span> Satellite Imagery
     </div>
-    <div class="layer-toggle" data-layer="sst" style="color: #f97316" onclick="toggleLayer('sst')">
-        <div class="dot"></div>
-        <span class="label">Sea Surface Temp</span>
-        <span class="count">VIIRS</span>
-    </div>
-    <div class="layer-toggle" data-layer="ssh" style="color: #a78bfa" onclick="toggleLayer('ssh')">
-        <div class="dot"></div>
-        <span class="label">Sea Surface Height</span>
-        <span class="count">Altimetry</span>
-    </div>
-
-    <h3>Sensor Networks</h3>
-    <div class="layer-toggle active" data-layer="ndbc" style="color: #facc15" onclick="toggleLayer('ndbc')">
-        <div class="dot"></div>
-        <span class="label">NDBC Hypoxia Stations</span>
-        <span class="count" id="ndbc-count">—</span>
-    </div>
-    <div class="layer-toggle active" data-layer="coops" style="color: #fb7185" onclick="toggleLayer('coops')">
-        <div class="dot"></div>
-        <span class="label">CO-OPS Tidal Currents</span>
-        <span class="count" id="coops-count">—</span>
-    </div>
-    <div class="layer-toggle active" data-layer="ioos" style="color: #2dd4bf" onclick="toggleLayer('ioos')">
-        <div class="dot"></div>
-        <span class="label">IOOS Sensor Network</span>
-        <span class="count" id="ioos-count">—</span>
+    <div class="layer-group-body" id="grp-sat-grp">
+        <div class="layer-toggle active" data-layer="chlorophyll" style="color:#22c55e" onclick="toggleLayer('chlorophyll')">
+            <div class="dot"></div><span class="label">Chlorophyll-a</span><span class="count">OLCI</span>
+        </div>
+        <div class="layer-toggle" data-layer="sst" style="color:#f97316" onclick="toggleLayer('sst')">
+            <div class="dot"></div><span class="label">Sea Surface Temp</span><span class="count">VIIRS</span>
+        </div>
+        <div class="layer-toggle" data-layer="salinity" style="color:#818cf8" onclick="toggleLayer('salinity')">
+            <div class="dot"></div><span class="label">Sea Surface Salinity</span><span class="count">SMOS</span>
+        </div>
+        <div class="layer-toggle" data-layer="kd490" style="color:#67e8f9" onclick="toggleLayer('kd490')">
+            <div class="dot"></div><span class="label">Water Clarity (Kd490)</span><span class="count">VIIRS</span>
+        </div>
     </div>
 
-    <h3>Exploration</h3>
-    <div class="layer-toggle active" data-layer="gliders" style="color: #c084fc" onclick="toggleLayer('gliders')">
-        <div class="dot"></div>
-        <span class="label">Glider Tracks</span>
-        <span class="count" id="glider-count">—</span>
+    <div class="layer-group-header" onclick="toggleGroup('sensor-grp')">
+        <span class="chevron" id="chevron-sensor-grp">▼</span> In-Situ Sensors
+    </div>
+    <div class="layer-group-body" id="grp-sensor-grp">
+        <div class="layer-toggle active" data-layer="ndbc" style="color:#facc15" onclick="toggleLayer('ndbc')">
+            <div class="dot"></div><span class="label">NDBC Hypoxia</span><span class="count" id="ndbc-count">—</span>
+        </div>
+        <div class="layer-toggle active" data-layer="ndbc_met" style="color:#fbbf24" onclick="toggleLayer('ndbc_met')">
+            <div class="dot"></div><span class="label">NDBC Weather Buoys</span><span class="count" id="ndbc-met-count">—</span>
+        </div>
+        <div class="layer-toggle active" data-layer="coops" style="color:#fb7185" onclick="toggleLayer('coops')">
+            <div class="dot"></div><span class="label">CO-OPS Tidal Stations</span><span class="count" id="coops-count">—</span>
+        </div>
+        <div class="layer-toggle active" data-layer="ioos" style="color:#2dd4bf" onclick="toggleLayer('ioos')">
+            <div class="dot"></div><span class="label">IOOS Sensor Network</span><span class="count" id="ioos-count">—</span>
+        </div>
+    </div>
+
+    <div class="layer-group-header" onclick="toggleGroup('hazard-grp')">
+        <span class="chevron" id="chevron-hazard-grp">▼</span> Hazards & Events
+    </div>
+    <div class="layer-group-body" id="grp-hazard-grp">
+        <div class="layer-toggle active" data-layer="incidents" style="color:#ef4444" onclick="toggleLayer('incidents')">
+            <div class="dot"></div><span class="label">Oil Spills & Pollution</span><span class="count" id="incidents-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="pmel" style="color:#f472b6" onclick="toggleLayer('pmel')">
+            <div class="dot"></div><span class="label">Hurricane Probes</span><span class="count" id="pmel-count">—</span>
+        </div>
+    </div>
+
+    <div class="layer-group-header" onclick="toggleGroup('sub-grp')">
+        <span class="chevron" id="chevron-sub-grp">▼</span> Subsurface
+    </div>
+    <div class="layer-group-body" id="grp-sub-grp">
+        <div class="layer-toggle active" data-layer="gliders" style="color:#c084fc" onclick="toggleLayer('gliders')">
+            <div class="dot"></div><span class="label">Glider Tracks</span><span class="count" id="glider-count">—</span>
+        </div>
+    </div>
+
+    <div class="layer-group-header" onclick="toggleGroup('wx-grp')">
+        <span class="chevron" id="chevron-wx-grp">▼</span> Weather
+    </div>
+    <div class="layer-group-body collapsed" id="grp-wx-grp">
+        <div class="layer-toggle" data-layer="wind" style="color:#94a3b8" onclick="toggleLayer('wind')">
+            <div class="dot"></div><span class="label">Wind Barbs</span><span class="count" id="wind-count">—</span>
+        </div>
+        <div class="layer-toggle" data-layer="waves" style="color:#60a5fa" onclick="toggleLayer('waves')">
+            <div class="dot"></div><span class="label">Wave Height</span><span class="count" id="wave-count">—</span>
+        </div>
     </div>
 </div>
 
+<!-- ═══════ STATS BAR ═══════ -->
 <div class="stats-bar" id="stats-bar">
     <div class="stat-chip"><span class="num" id="stat-sensors">—</span><span class="lbl">sensors</span></div>
-    <div class="stat-chip"><span class="num" id="stat-current-speed">—</span><span class="lbl">avg m/s</span></div>
+    <div class="stat-chip"><span class="num" id="stat-collections">9</span><span class="lbl">collections</span></div>
+    <div class="stat-chip"><span class="num" id="stat-layers">22</span><span class="lbl">layers</span></div>
     <div class="stat-chip"><span class="num" id="stat-particles">—</span><span class="lbl">particles</span></div>
-    <div class="stat-chip"><span class="num" id="stat-datasets">8</span><span class="lbl">AQUAVIEW datasets</span></div>
     <div class="stat-chip"><span class="num" id="stat-updated" style="color:#22c55e;cursor:help" title="">—</span><span class="lbl">updated</span></div>
 </div>
 
@@ -478,10 +214,10 @@
     <div class="labels"><span>0</span><span>0.25</span><span>0.5</span><span>m/s</span></div>
 </div>
 
-<!-- ═══════ ABOUT OVERLAY ═══════ -->
+<!-- ═══════ ABOUT ═══════ -->
 <div class="about-overlay" id="about-overlay" onclick="if(event.target===this)toggleAbout()">
     <div class="about-panel">
-        <button class="about-close" onclick="toggleAbout()">×</button>
+        <button class="about-close" onclick="toggleAbout()">&times;</button>
         <div class="about-tabs">
             <div class="about-tab active" onclick="switchTab('overview')">Overview</div>
             <div class="about-tab" onclick="switchTab('layers')">Data Layers</div>
@@ -489,164 +225,64 @@
             <div class="about-tab" onclick="switchTab('models')">ML Models</div>
         </div>
 
-        <!-- TAB: Overview -->
         <div class="about-content tab-pane active" id="tab-overview">
             <h2>AQUAVIEW Gulf Ocean Intelligence Explorer</h2>
-            <p>This interactive visualization brings together <span class="highlight">eight real-time oceanographic datasets</span> into a single operational picture of the Gulf of Mexico — powered entirely by <span class="highlight">AQUAVIEW</span>, NOAA's federated ocean data infrastructure.</p>
-
+            <p>The <span class="hl">ultimate Common Operating Picture</span> for the Gulf of Mexico — bringing together <span class="hl">22 real-time layers</span> across 9 AQUAVIEW data collections into a single visualization. Surface currents, satellite imagery, thousands of in-situ sensors, glider missions, drifter tracks, oil spill alerts, and weather observations — all sourced through AQUAVIEW's federated ocean data infrastructure.</p>
             <h3>What is AQUAVIEW?</h3>
-            <p>AQUAVIEW is a NOAA-hosted geospatial data federation built on the <span class="highlight">SpatioTemporal Asset Catalog (STAC)</span> standard. It provides a single, searchable entry point to over 24 oceanographic collections — from real-time buoy sensors to satellite imagery to autonomous glider missions — spanning agencies like NDBC, CO-OPS, CoastWatch, and IOOS.</p>
-            <p>Rather than querying dozens of siloed APIs individually, researchers and applications can discover, access, and combine ocean data through AQUAVIEW's unified catalog. This explorer demonstrates what becomes possible when those data streams are combined in a single visualization.</p>
-
+            <p>AQUAVIEW is a NOAA-hosted geospatial data federation built on the <span class="hl">SpatioTemporal Asset Catalog (STAC)</span> standard. It provides a single, searchable entry point to over 24 oceanographic collections spanning NDBC, CO-OPS, CoastWatch, IOOS, PMEL, and more. This explorer queries AQUAVIEW every 6 hours to discover and fetch the latest Gulf data.</p>
             <h3>What you're seeing</h3>
-            <p>The map displays <span class="highlight">animated ocean surface currents</span> derived from satellite altimetry (Sentinel-3A/B, CryoSat-2, Jason-3, SARAL), with 5,000 particles tracing flow patterns in real time. Beneath the currents, toggleable satellite imagery shows chlorophyll-a concentration (an indicator of algal productivity), sea surface temperature, and sea surface height anomalies.</p>
-            <p>Overlaid on this physical oceanography are <span class="highlight">three in-situ sensor networks</span>: NDBC buoys instrumented for dissolved oxygen monitoring (the hypoxia early warning system), CO-OPS tidal current stations providing 6-minute current meter data, and the broader IOOS water level observation network. Dashed tracks show autonomous underwater glider missions deployed by universities across the Gulf.</p>
-
+            <p><span class="hl">5,000 animated particles</span> trace ocean surface currents from satellite altimetry. Beneath them: chlorophyll-a, SST, salinity, and water clarity satellite imagery. Overlaid: ~500 IOOS sensors, 313 NDBC buoys, 140 CO-OPS tidal stations, 58 hypoxia monitoring stations with ML forecasts, 51 glider missions, 110 pollution incidents, and hurricane monitoring probes.</p>
             <h3>Why it matters</h3>
-            <p>The Gulf of Mexico experiences the largest recurring <span class="highlight">hypoxic "dead zone"</span> in the Western Hemisphere — an area of critically low dissolved oxygen driven by nutrient runoff and stratification. By combining real-time sensor data with satellite-derived environmental context and machine learning forecasts, this system provides early warning of hypoxic conditions that threaten fisheries, ecosystems, and coastal economies. AQUAVIEW makes this multi-source fusion possible by breaking down barriers between agencies and data formats.</p>
+            <p>The Gulf of Mexico hosts the Western Hemisphere's largest recurring <span class="hl">hypoxic dead zone</span>. By fusing real-time data from every available source through AQUAVIEW, this COP enables early warning of hypoxic events, oil spill tracking, hurricane monitoring, and ecosystem-scale situational awareness.</p>
         </div>
 
-        <!-- TAB: Layers -->
         <div class="about-content tab-pane" id="tab-layers">
-            <h2>Data Layers</h2>
-            <p>Each layer on this map is sourced from a different AQUAVIEW-accessible collection. All data is fetched live from public APIs.</p>
-
+            <h2>Data Layers — 22 layers across 9 collections</h2>
+            <p>All data discovered through the AQUAVIEW STAC API, pre-fetched server-side every 6 hours via GitHub Actions.</p>
             <div class="data-grid">
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#38bdf8"></span> Surface Currents</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> CoastWatch Blended NRT Currents<br>
-                        <strong>Dataset:</strong> noaacwBLENDEDNRTcurrentsDaily<br>
-                        <strong>Resolution:</strong> 0.25° global grid, daily<br>
-                        <strong>Derived from:</strong> Satellite altimetry (geostrophic calculation from SSH gradients)<br>
-                        <strong>Satellites:</strong> Sentinel-3A/B, CryoSat-2, Jason-3, SARAL/AltiKa<br>
-                        <strong>Viz:</strong> 5,000 particles with bilinear velocity interpolation
-                    </div>
-                </div>
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#22c55e"></span> Chlorophyll-a</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> CoastWatch Sentinel-3B OLCI<br>
-                        <strong>Dataset:</strong> noaacwS3BOLCIchlaDaily<br>
-                        <strong>Resolution:</strong> ~300m, daily composite<br>
-                        <strong>Measures:</strong> Near-surface chlorophyll concentration (mg/m³), an indicator of phytoplankton biomass and potential harmful algal blooms<br>
-                        <strong>Scale:</strong> Log color scale, 0.01–30 mg/m³
-                    </div>
-                </div>
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#f97316"></span> Sea Surface Temp</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> CoastWatch VIIRS ACSPO<br>
-                        <strong>Dataset:</strong> noaacwSNPPACSPOSSTL3GCDaily<br>
-                        <strong>Resolution:</strong> ~750m, daily gap-free<br>
-                        <strong>Satellite:</strong> Suomi-NPP VIIRS sensor<br>
-                        <strong>Range:</strong> 10–32°C in Gulf region<br>
-                        <strong>Use:</strong> Thermal stratification drives hypoxia risk
-                    </div>
-                </div>
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#a78bfa"></span> Sea Surface Height</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> CoastWatch Blended NRT<br>
-                        <strong>Dataset:</strong> noaacwBLENDEDNRTcurrentsDaily (ssh variable)<br>
-                        <strong>Resolution:</strong> 0.25°, daily<br>
-                        <strong>Measures:</strong> SSH anomaly (meters) from multi-satellite altimetry<br>
-                        <strong>Use:</strong> SSH gradients drive geostrophic currents; Loop Current detection
-                    </div>
-                </div>
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#facc15"></span> NDBC Hypoxia Stations</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> NDBC Realtime (.ocean feeds)<br>
-                        <strong>Network:</strong> 58 stations in Gulf monitoring zone<br>
-                        <strong>Parameters:</strong> Dissolved oxygen, temperature, salinity, pH, turbidity<br>
-                        <strong>Frequency:</strong> Hourly observations<br>
-                        <strong>ML Models:</strong> TimesFM + XGBoost onset prediction
-                    </div>
-                </div>
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#fb7185"></span> CO-OPS Tidal Currents</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> NOAA CO-OPS Current Predictions<br>
-                        <strong>Network:</strong> 28 stations across Gulf ports and channels<br>
-                        <strong>Parameters:</strong> Current speed, direction, tidal predictions<br>
-                        <strong>Frequency:</strong> 6-minute intervals<br>
-                        <strong>Use:</strong> Navigation, pollutant transport, larval dispersal
-                    </div>
-                </div>
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#2dd4bf"></span> IOOS Water Levels</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> CO-OPS via IOOS Integration<br>
-                        <strong>Network:</strong> ~60 stations in Gulf region<br>
-                        <strong>Parameters:</strong> Water level, tidal datums, meteorological<br>
-                        <strong>Frequency:</strong> 6-minute real-time<br>
-                        <strong>Use:</strong> Storm surge, flooding, vertical mixing context
-                    </div>
-                </div>
-                <div class="data-card">
-                    <div class="dc-title"><span class="dc-dot" style="background:#c084fc"></span> Glider Missions</div>
-                    <div class="dc-detail">
-                        <strong>Source:</strong> IOOS Glider DAC ERDDAP<br>
-                        <strong>Platforms:</strong> Slocum gliders from USF, TAMU, UL Lafayette<br>
-                        <strong>Parameters:</strong> CTD profiles, dissolved O₂, acoustics<br>
-                        <strong>Mission types:</strong> Red tide monitoring, hurricane picket lines, acoustic surveys<br>
-                        <strong>Coverage:</strong> West Florida Shelf to central Gulf
-                    </div>
-                </div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#38bdf8"></span> Surface Currents</div><div class="dc-detail">CoastWatch Blended NRT • 0.25° grid daily • 5,000 particles with bilinear interpolation</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#22c55e"></span> Chlorophyll-a</div><div class="dc-detail">Sentinel-3B OLCI • 300m daily • Phytoplankton / HAB indicator</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#f97316"></span> Sea Surface Temp</div><div class="dc-detail">VIIRS ACSPO • 750m daily • Thermal stratification context</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#818cf8"></span> Sea Surface Salinity</div><div class="dc-detail">SMOS L3 • 0.25° daily • Freshwater plumes / river outflow</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#facc15"></span> NDBC Hypoxia</div><div class="dc-detail">58 stations • DO, temp, sal, pH • TimesFM + XGBoost predictions</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#fbbf24"></span> NDBC Weather Buoys</div><div class="dc-detail">~313 buoys from AQUAVIEW NDBC collection • Wind, waves, SST, pressure</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#fb7185"></span> CO-OPS Tidal</div><div class="dc-detail">~140 stations from AQUAVIEW COOPS • Water level, tidal predictions</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#2dd4bf"></span> IOOS Sensors</div><div class="dc-detail">~500 from AQUAVIEW IOOS_SENSORS • Temp, sal, chl, DO, nutrients</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#ef4444"></span> Oil Spills</div><div class="dc-detail">AQUAVIEW INCIDENT_NEWS • ~110 Gulf incidents, last 2 years</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#c084fc"></span> Gliders</div><div class="dc-detail">AQUAVIEW IOOS collection • ~51 active/recent Gulf missions</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#f472b6"></span> PMEL Probes</div><div class="dc-detail">AQUAVIEW PMEL collection • Hurricane monitoring Oshen floats</div></div>
+                <div class="data-card"><div class="dc-title"><span class="dc-dot" style="background:#94a3b8"></span> Weather</div><div class="dc-detail">Wind barbs + wave height from NDBC met data • Standard meteorological notation</div></div>
             </div>
         </div>
 
-        <!-- TAB: Technology -->
         <div class="about-content tab-pane" id="tab-tech">
             <h2>Technical Architecture</h2>
-
-            <h3>Data Discovery via AQUAVIEW STAC</h3>
-            <p>All datasets in this visualization were discovered through the <span class="highlight">AQUAVIEW STAC API</span> — a federated catalog that indexes 24+ oceanographic collections across NOAA agencies. The STAC standard (used by NASA, ESA, USGS) provides machine-readable metadata including spatial/temporal extents, access endpoints, and data formats. This enabled programmatic discovery of relevant Gulf of Mexico data sources without prior knowledge of individual agency APIs.</p>
-
-            <h3>Particle Animation System</h3>
-            <p>Ocean currents are visualized using a custom HTML5 Canvas particle system running at 60fps. The system maintains <span class="highlight">4,000 concurrent particles</span>, each following the velocity field through bilinear interpolation over the 0.25° current grid. Particles have an 80-frame lifetime with stochastic respawning, and are rendered using additive blending ('lighter' composite mode) with an alpha-fade trail effect (opacity 0.94 per frame) to create the flowing visualization.</p>
-            <p>Particle speed maps to color through a 4-stop gradient: deep blue (still) → cyan (slow) → purple (moderate) → pink/gold (fast, >0.5 m/s). The velocity scaling factor adjusts with map zoom level to maintain visual coherence.</p>
-
-            <h3>Satellite WMS Integration</h3>
-            <p>Satellite imagery (chlorophyll, SST, SSH) is loaded via <span class="highlight">OGC Web Map Service (WMS)</span> from CoastWatch ERDDAP servers. These are served as tiled PNG images with transparency, overlaid on the CartoDB Dark Matter basemap using Leaflet's WMS tile layer. Each product uses optimized color scales (log scale for chlorophyll, linear for SST/SSH) set via ERDDAP's WMS styling parameters.</p>
-
-            <h3>Real-Time Sensor Data</h3>
-            <p>Sensor observations are fetched live from NDBC realtime text feeds (.ocean format) and the CO-OPS metadata API. The NDBC parser handles fill values ('MM', ≥99), resamples to hourly cadence, and forward-fills gaps up to 6 hours. All fetch operations run in parallel using <span class="highlight">Promise.all()</span> to minimize load time.</p>
-
-            <h3>Glider Track Data</h3>
-            <p>Autonomous glider trajectories are sourced from the <span class="highlight">IOOS Glider DAC ERDDAP</span> service (gliders.ioos.us). Dataset discovery uses the allDatasets endpoint filtered by Gulf bounding box and recent deployment dates. Trajectory coordinates are decimated to ~15 points per mission for efficient rendering as Leaflet polylines with dashed styling and animated endpoint markers.</p>
-
+            <h3>AQUAVIEW STAC Discovery</h3>
+            <p>Every 6 hours, a Python script queries the <span class="hl">AQUAVIEW STAC API</span> with a Gulf bounding box filter across 7+ collections. Each STAC item includes <code>aquaview:source_url</code> pointing to the original ERDDAP server, plus <code>aquaview:variables</code> listing available parameters. The script fetches latest readings from each source and writes static JSON files to <code>docs/data/</code>, bypassing browser CORS restrictions.</p>
+            <h3>Particle System</h3>
+            <p>5,000 particles with 120-frame lifetime, bilinear velocity interpolation, speed-proportional line width and color, and alpha-fade trails (0.975 opacity per frame). Zoom-responsive scaling maintains visual coherence from zoom 4 to 12.</p>
             <h3>Stack</h3>
             <p>
                 <span class="tag" style="background:rgba(56,189,248,0.15);color:#38bdf8">Leaflet 1.9</span>
                 <span class="tag" style="background:rgba(34,197,94,0.15);color:#22c55e">HTML5 Canvas</span>
-                <span class="tag" style="background:rgba(249,115,22,0.15);color:#f97316">CoastWatch ERDDAP</span>
-                <span class="tag" style="background:rgba(192,132,252,0.15);color:#c084fc">IOOS ERDDAP</span>
+                <span class="tag" style="background:rgba(167,139,250,0.15);color:#a78bfa">AQUAVIEW STAC</span>
+                <span class="tag" style="background:rgba(249,115,22,0.15);color:#f97316">CoastWatch WMS</span>
                 <span class="tag" style="background:rgba(250,204,21,0.15);color:#facc15">NDBC Realtime</span>
                 <span class="tag" style="background:rgba(251,113,133,0.15);color:#fb7185">CO-OPS API</span>
-                <span class="tag" style="background:rgba(167,139,250,0.15);color:#a78bfa">AQUAVIEW STAC</span>
-                <span class="tag" style="background:rgba(45,212,191,0.15);color:#2dd4bf">OGC WMS</span>
+                <span class="tag" style="background:rgba(45,212,191,0.15);color:#2dd4bf">IOOS ERDDAP</span>
+                <span class="tag" style="background:rgba(239,68,68,0.15);color:#ef4444">GitHub Actions</span>
             </p>
         </div>
 
-        <!-- TAB: Models -->
         <div class="about-content tab-pane" id="tab-models">
             <h2>Machine Learning Models</h2>
-            <p>The NDBC hypoxia stations (yellow markers) are paired with two machine learning models that forecast the probability of <span class="highlight">dissolved oxygen dropping below 2.0 mg/L</span> — the threshold for hypoxia — at 1, 3, 5, and 7-day lead times.</p>
-
+            <p>The NDBC hypoxia stations (yellow markers) are paired with ML models forecasting <span class="hl">dissolved oxygen dropping below 2.0 mg/L</span> at 1, 3, 5, and 7-day lead times.</p>
             <h3>TimesFM (Google Foundation Model)</h3>
-            <p><span class="highlight">TimesFM</span> is Google's 200M-parameter time series foundation model, pre-trained on 100B time points from Google Trends, Wikipedia pageviews, and synthetic data. We use it as a zero-shot forecaster: it ingests the last ~512 hours of dissolved oxygen observations from NDBC sensors and produces probabilistic forecasts for the next 168 hours (7 days).</p>
-            <p>The onset probability is computed by blending two signals: (1) the fraction of quantile forecast lines that cross below 2.0 mg/L (weighted 60%), and (2) the fraction of point forecast hours below threshold (weighted 40%). This quantile-based approach captures forecast uncertainty — if many quantile paths dip below threshold, the model is expressing concern even if the median forecast stays safe.</p>
-
-            <h3>XGBoost (Gradient-Boosted Baseline)</h3>
-            <p>XGBoost serves as a traditional ML baseline. It's trained on engineered features from the DO time series: rolling statistics (mean, min, max, std over multiple windows), temporal features (hour-of-day, day-of-year, tidal harmonics), and change-point features (rate of DO decline, hours since last threshold crossing). The model was evaluated against TimesFM in a head-to-head benchmark across 6 stations using the AQUAVIEW historical archive.</p>
-
-            <h3>Benchmark Results</h3>
-            <p>On historical validation data from Gulf hypoxia-prone stations, both models achieve high accuracy in non-hypoxic conditions (winter/spring). The key differentiation appears during summer onset events, where TimesFM's ability to learn complex temporal patterns from its massive pre-training corpus provides an advantage over hand-crafted features. Full benchmark results — including per-station RMSE, MAE, and onset detection metrics — are available in the companion dashboard.</p>
-
-            <h3>Live Prediction Pipeline</h3>
-            <p>Every 6 hours, the pipeline fetches ~45 days of recent DO observations from NDBC realtime feeds, preprocesses them (hourly resampling, gap-filling, normalization), runs TimesFM inference on CPU, and updates the station prediction JSON. Stations without active DO sensors fall back to the statistical estimator, which uses the sigmoid of the z-score distance to threshold with a lead-time scaling factor.</p>
+            <p>200M-parameter zero-shot time series forecaster. Ingests ~512 hours of DO observations and produces probabilistic forecasts blending quantile crossings (60%) and point forecast hours below threshold (40%).</p>
+            <h3>XGBoost Baseline</h3>
+            <p>Traditional ML baseline with engineered features: rolling statistics, temporal features, tidal harmonics, and change-point detection. Trained per-station with temporal splits.</p>
+            <h3>Live Pipeline</h3>
+            <p>Every 6 hours: fetch ~45 days of DO data from NDBC, preprocess, run TimesFM on CPU, and update prediction JSON. Stations without active sensors use a statistical estimator.</p>
         </div>
     </div>
 </div>
@@ -655,7 +291,7 @@
     <h1 style="font-size: 22px; font-weight: 300; letter-spacing: 0.05em; color: #e0e6f0">
         AQUAVIEW <span style="font-weight: 700">Ocean Intelligence</span>
     </h1>
-    <div class="loading-text" id="loading-text">Initializing ocean model...</div>
+    <div class="loading-text" id="loading-text">Initializing ultimate COP...</div>
     <div class="loading-bar"><div class="fill"></div></div>
 </div>
 
@@ -678,23 +314,26 @@ const CURRENT_URL_LIVE = 'https://coastwatch.noaa.gov/erddap/griddap/noaacwBLEND
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
-let map, canvas, ctx;
+let map, canvas, ctx, windCanvas, windCtx;
 let currentGrid = null;
 let particles = [];
 let animRunning = true;
 let layerState = {
-    currents: true, chlorophyll: true, sst: false, ssh: false,
-    ndbc: true, coops: true, ioos: true, gliders: true
+    currents: true, drifters: false, ssh: false,
+    chlorophyll: true, sst: false, salinity: false, kd490: false,
+    ndbc: true, ndbc_met: true, coops: true, ioos: true,
+    incidents: true, pmel: false,
+    gliders: true,
+    wind: false, waves: false
 };
 let leafletLayers = {};
 let totalSensors = 0;
+let ndbcMetData = null;  // Cache for wind/wave rendering
 
 // ═══════════════════════════════════════════════════════════
-// ABOUT PANEL
+// HELPERS
 // ═══════════════════════════════════════════════════════════
-function toggleAbout() {
-    document.getElementById('about-overlay').classList.toggle('visible');
-}
+function toggleAbout() { document.getElementById('about-overlay').classList.toggle('visible'); }
 window.toggleAbout = toggleAbout;
 
 function switchTab(name) {
@@ -705,125 +344,110 @@ function switchTab(name) {
 }
 window.switchTab = switchTab;
 
+function toggleGroup(id) {
+    const body = document.getElementById('grp-' + id);
+    const chev = document.getElementById('chevron-' + id);
+    body.classList.toggle('collapsed');
+    chev.classList.toggle('collapsed');
+}
+window.toggleGroup = toggleGroup;
+
+function setLoadingText(text) { document.getElementById('loading-text').textContent = text; }
+
+function setCount(id, n) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = typeof n === 'number' ? n.toLocaleString() : n;
+}
+
 // ═══════════════════════════════════════════════════════════
 // MAP SETUP
 // ═══════════════════════════════════════════════════════════
 function initMap() {
-    map = L.map('map', {
-        center: [26.5, -89],
-        zoom: 5,
-        minZoom: 4,
-        maxZoom: 12,
-        zoomControl: false,
-        attributionControl: true,
-    });
-
+    map = L.map('map', { center: [26.5, -89], zoom: 5, minZoom: 4, maxZoom: 12, zoomControl: false, attributionControl: true });
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://carto.com/">CARTO</a> | Data: <a href="https://aquaview.org">AQUAVIEW</a>, NOAA, CoastWatch',
+        attribution: '&copy; <a href="https://carto.com/">CARTO</a> | <a href="https://aquaview-sfeos-1025757962819.us-east1.run.app">AQUAVIEW</a>, NOAA',
         maxZoom: 19,
     }).addTo(map);
 
-    // Satellite WMS layers
+    // ─── WMS Satellite Layers ───
     leafletLayers.chlorophyll = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwS3BOLCIchlaDaily/request?', {
-        layers: 'noaacwS3BOLCIchlaDaily:chlor_a',
-        format: 'image/png', transparent: true, opacity: 0.4,
+        layers: 'noaacwS3BOLCIchlaDaily:chlor_a', format: 'image/png', transparent: true, opacity: 0.4,
         styles: 'rainbow~Log', colorBarMin: 0.01, colorBarMax: 30,
     });
-
     leafletLayers.sst = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwSNPPACSPOSSTL3GCDaily/request?', {
-        layers: 'noaacwSNPPACSPOSSTL3GCDaily:sea_surface_temperature',
-        format: 'image/png', transparent: true, opacity: 0.4,
+        layers: 'noaacwSNPPACSPOSSTL3GCDaily:sea_surface_temperature', format: 'image/png', transparent: true, opacity: 0.4,
         styles: 'rainbow~Linear', colorBarMin: 10, colorBarMax: 32,
     });
-
     leafletLayers.ssh = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwBLENDEDNRTcurrentsDaily/request?', {
-        layers: 'noaacwBLENDEDNRTcurrentsDaily:ssh',
-        format: 'image/png', transparent: true, opacity: 0.35,
+        layers: 'noaacwBLENDEDNRTcurrentsDaily:ssh', format: 'image/png', transparent: true, opacity: 0.35,
         styles: 'rainbow~Linear', colorBarMin: -0.5, colorBarMax: 0.5,
+    });
+    leafletLayers.salinity = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwSMOSsssDaily/request?', {
+        layers: 'noaacwSMOSsssDaily:sss', format: 'image/png', transparent: true, opacity: 0.4,
+        styles: 'rainbow~Linear', colorBarMin: 30, colorBarMax: 38,
+    });
+    leafletLayers.kd490 = L.tileLayer.wms('https://coastwatch.noaa.gov/erddap/wms/noaacwVIIRSSNPPkd490Daily/request?', {
+        layers: 'noaacwVIIRSSNPPkd490Daily:kd_490', format: 'image/png', transparent: true, opacity: 0.4,
+        styles: 'rainbow~Log', colorBarMin: 0.01, colorBarMax: 5,
     });
 
     if (layerState.chlorophyll) leafletLayers.chlorophyll.addTo(map);
 
+    // Canvas
     canvas = document.getElementById('current-canvas');
     ctx = canvas.getContext('2d');
+    windCanvas = document.getElementById('wind-canvas');
+    windCtx = windCanvas.getContext('2d');
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
-    map.on('move zoom moveend zoomend', () => { clearCanvas(); });
+    map.on('move zoom moveend zoomend', () => { clearCanvas(); renderWindBarbs(); renderWaveCircles(); });
 }
 
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.width = windCanvas.width = window.innerWidth;
+    canvas.height = windCanvas.height = window.innerHeight;
 }
-
-function clearCanvas() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+function clearCanvas() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
 // ═══════════════════════════════════════════════════════════
-// OCEAN CURRENT DATA
+// OCEAN CURRENTS
 // ═══════════════════════════════════════════════════════════
 async function fetchCurrents() {
     setLoadingText('Downloading ocean current vectors...');
     try {
-        // Try pre-fetched static file first (updated by GitHub Actions), then live ERDDAP
         let json;
         try {
             const localResp = await fetch(CURRENT_URL_LOCAL);
             if (localResp.ok) json = await localResp.json();
-        } catch(e) { /* local fetch failed, try live */ }
+        } catch(e) {}
         if (!json) {
             const liveResp = await fetch(CURRENT_URL_LIVE);
             if (!liveResp.ok) throw new Error(`HTTP ${liveResp.status}`);
             json = await liveResp.json();
         }
-
-        const table = json.table;
-        const rows = table.rows;
-
+        const table = json.table, rows = table.rows;
         const latSet = new Set(), lonSet = new Set();
         rows.forEach(r => { latSet.add(r[1]); lonSet.add(r[2]); });
-
         const lats = [...latSet].sort((a,b) => a - b);
         const lons = [...lonSet].sort((a,b) => a - b);
         const nLat = lats.length, nLon = lons.length;
-
         const u = Array.from({length: nLat}, () => new Float32Array(nLon));
         const v = Array.from({length: nLat}, () => new Float32Array(nLon));
-
         const latIdx = {}, lonIdx = {};
-        lats.forEach((l,i) => latIdx[l] = i);
-        lons.forEach((l,i) => lonIdx[l] = i);
-
+        lats.forEach((l,i) => latIdx[l] = i); lons.forEach((l,i) => lonIdx[l] = i);
         let validCount = 0;
         rows.forEach(r => {
             const li = latIdx[r[1]], lo = lonIdx[r[2]];
-            if (li !== undefined && lo !== undefined) {
-                const uVal = r[3], vVal = r[4];
-                if (uVal != null && vVal != null) {
-                    u[li][lo] = uVal;
-                    v[li][lo] = vVal;
-                    validCount++;
-                }
+            if (li !== undefined && lo !== undefined && r[3] != null && r[4] != null) {
+                u[li][lo] = r[3]; v[li][lo] = r[4]; validCount++;
             }
         });
-
         currentGrid = { lats, lons, u, v, nLat, nLon };
-        document.getElementById('currents-status').textContent = validCount + ' pts';
-
-        let totalSpeed = 0, speedCount = 0;
-        rows.forEach(r => {
-            if (r[3] != null && r[4] != null) {
-                totalSpeed += Math.sqrt(r[3]*r[3] + r[4]*r[4]);
-                speedCount++;
-            }
-        });
-        document.getElementById('stat-current-speed').textContent = (totalSpeed / speedCount).toFixed(2);
-
+        setCount('currents-status', validCount + ' pts');
         return true;
     } catch (e) {
         console.error('Current fetch failed:', e);
-        document.getElementById('currents-status').textContent = 'offline';
+        setCount('currents-status', 'offline');
         return false;
     }
 }
@@ -831,30 +455,18 @@ async function fetchCurrents() {
 function interpolateCurrent(lat, lon) {
     if (!currentGrid) return [0, 0];
     const g = currentGrid;
-
-    const latStep = g.lats[1] - g.lats[0];
-    const lonStep = g.lons[1] - g.lons[0];
-    const li = (lat - g.lats[0]) / latStep;
-    const lo = (lon - g.lons[0]) / lonStep;
-
+    const latStep = g.lats[1] - g.lats[0], lonStep = g.lons[1] - g.lons[0];
+    const li = (lat - g.lats[0]) / latStep, lo = (lon - g.lons[0]) / lonStep;
     const li0 = Math.floor(li), lo0 = Math.floor(lo);
     if (li0 < 0 || li0 >= g.nLat - 1 || lo0 < 0 || lo0 >= g.nLon - 1) return [0, 0];
-
-    const fracLat = li - li0, fracLon = lo - lo0;
-
-    const u00 = g.u[li0][lo0], u10 = g.u[li0+1][lo0];
-    const u01 = g.u[li0][lo0+1], u11 = g.u[li0+1][lo0+1];
-    const v00 = g.v[li0][lo0], v10 = g.v[li0+1][lo0];
-    const v01 = g.v[li0][lo0+1], v11 = g.v[li0+1][lo0+1];
-
+    const fLat = li - li0, fLon = lo - lo0;
+    const u00 = g.u[li0][lo0], u10 = g.u[li0+1][lo0], u01 = g.u[li0][lo0+1], u11 = g.u[li0+1][lo0+1];
+    const v00 = g.v[li0][lo0], v10 = g.v[li0+1][lo0], v01 = g.v[li0][lo0+1], v11 = g.v[li0+1][lo0+1];
     if (!u00 && !u10 && !u01 && !u11) return [0, 0];
-
-    const uInterp = (1-fracLat)*(1-fracLon)*u00 + fracLat*(1-fracLon)*u10
-                   + (1-fracLat)*fracLon*u01 + fracLat*fracLon*u11;
-    const vInterp = (1-fracLat)*(1-fracLon)*v00 + fracLat*(1-fracLon)*v10
-                   + (1-fracLat)*fracLon*v01 + fracLat*fracLon*v11;
-
-    return [uInterp, vInterp];
+    return [
+        (1-fLat)*(1-fLon)*u00 + fLat*(1-fLon)*u10 + (1-fLat)*fLon*u01 + fLat*fLon*u11,
+        (1-fLat)*(1-fLon)*v00 + fLat*(1-fLon)*v10 + (1-fLat)*fLon*v01 + fLat*fLon*v11
+    ];
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -862,401 +474,412 @@ function interpolateCurrent(lat, lon) {
 // ═══════════════════════════════════════════════════════════
 function initParticles() {
     particles = [];
-    for (let i = 0; i < PARTICLE_COUNT; i++) {
-        particles.push(spawnParticle());
-    }
-    document.getElementById('stat-particles').textContent = PARTICLE_COUNT.toLocaleString();
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(spawnParticle());
+    setCount('stat-particles', PARTICLE_COUNT.toLocaleString());
 }
-
 function spawnParticle() {
-    const bounds = map.getBounds();
-    const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
-    const lon = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
-    return { lat, lon, age: Math.floor(Math.random() * PARTICLE_LIFETIME), prevX: null, prevY: null };
+    const b = map.getBounds();
+    return { lat: b.getSouth() + Math.random() * (b.getNorth() - b.getSouth()),
+             lon: b.getWest() + Math.random() * (b.getEast() - b.getWest()),
+             age: Math.floor(Math.random() * PARTICLE_LIFETIME), prevX: null, prevY: null };
 }
-
 function speedColor(speed) {
-    // Brighter, more saturated palette — visible on dark basemap
     const t = Math.min(speed / 0.5, 1);
-    if (t < 0.25) {
-        const s = t / 0.25;
-        return `rgba(${60+100*s}, ${100+120*s}, ${160+90*s}, 0.9)`;  // deep blue → cyan
-    } else if (t < 0.5) {
-        const s = (t - 0.25) / 0.25;
-        return `rgba(${160-30*s}, ${220}, ${250-10*s}, 1.0)`;  // bright cyan
-    } else if (t < 0.75) {
-        const s = (t - 0.5) / 0.25;
-        return `rgba(${130+120*s}, ${220-80*s}, ${240-100*s}, 1.0)`;  // cyan → warm
-    } else {
-        const s = (t - 0.75) / 0.25;
-        return `rgba(${250}, ${140+60*s}, ${140-80*s}, 1.0)`;  // warm orange/coral
-    }
+    if (t < 0.25) { const s = t/0.25; return `rgba(${60+100*s},${100+120*s},${160+90*s},0.9)`; }
+    else if (t < 0.5) { const s = (t-0.25)/0.25; return `rgba(${160-30*s},220,${250-10*s},1.0)`; }
+    else if (t < 0.75) { const s = (t-0.5)/0.25; return `rgba(${130+120*s},${220-80*s},${240-100*s},1.0)`; }
+    else { const s = (t-0.75)/0.25; return `rgba(250,${140+60*s},${140-80*s},1.0)`; }
 }
-
 function animateParticles() {
-    if (!animRunning || !layerState.currents || !currentGrid) {
-        requestAnimationFrame(animateParticles);
-        return;
-    }
-
+    if (!animRunning || !layerState.currents || !currentGrid) { requestAnimationFrame(animateParticles); return; }
     ctx.globalCompositeOperation = 'destination-in';
-    ctx.fillStyle = `rgba(0, 0, 0, ${FADE_OPACITY})`;
+    ctx.fillStyle = `rgba(0,0,0,${FADE_OPACITY})`;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.globalCompositeOperation = 'source-over';
-
-    const zoom = map.getZoom();
-    const speedMult = SPEED_SCALE * Math.pow(2, 8 - zoom);
-    const zoomScale = Math.max(1, (zoom - 3) * 0.5);
-    const lineWidth = PARTICLE_LINE_WIDTH * zoomScale;
-
+    const zoom = map.getZoom(), speedMult = SPEED_SCALE * Math.pow(2, 8 - zoom);
+    const zoomScale = Math.max(1, (zoom - 3) * 0.5), lineWidth = PARTICLE_LINE_WIDTH * zoomScale;
     for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.age++;
-
-        if (p.age > PARTICLE_LIFETIME) {
-            particles[i] = spawnParticle();
-            continue;
-        }
-
+        const p = particles[i]; p.age++;
+        if (p.age > PARTICLE_LIFETIME) { particles[i] = spawnParticle(); continue; }
         const [u, v] = interpolateCurrent(p.lat, p.lon);
         const speed = Math.sqrt(u*u + v*v);
-
-        if (speed < 0.001) {
-            particles[i] = spawnParticle();
-            continue;
-        }
-
-        const newLon = p.lon + u * speedMult;
-        const newLat = p.lat + v * speedMult;
-
+        if (speed < 0.001) { particles[i] = spawnParticle(); continue; }
+        const newLon = p.lon + u * speedMult, newLat = p.lat + v * speedMult;
         const pt = map.latLngToContainerPoint([newLat, newLon]);
-
         if (p.prevX !== null) {
-            ctx.beginPath();
-            ctx.moveTo(p.prevX, p.prevY);
-            ctx.lineTo(pt.x, pt.y);
-            ctx.strokeStyle = speedColor(speed);
-            ctx.lineWidth = lineWidth + speed * 2;
-            ctx.lineCap = 'round';
-            ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(p.prevX, p.prevY); ctx.lineTo(pt.x, pt.y);
+            ctx.strokeStyle = speedColor(speed); ctx.lineWidth = lineWidth + speed * 2;
+            ctx.lineCap = 'round'; ctx.stroke();
         }
-
-        p.prevX = pt.x;
-        p.prevY = pt.y;
-        p.lat = newLat;
-        p.lon = newLon;
-
-        const bounds = map.getBounds();
-        if (newLat < bounds.getSouth() || newLat > bounds.getNorth() ||
-            newLon < bounds.getWest() || newLon > bounds.getEast()) {
-            particles[i] = spawnParticle();
-        }
+        p.prevX = pt.x; p.prevY = pt.y; p.lat = newLat; p.lon = newLon;
+        const b = map.getBounds();
+        if (newLat < b.getSouth() || newLat > b.getNorth() || newLon < b.getWest() || newLon > b.getEast()) particles[i] = spawnParticle();
     }
-
     requestAnimationFrame(animateParticles);
 }
 
 // ═══════════════════════════════════════════════════════════
-// SENSOR LAYERS
+// SENSOR LAYERS — All from pre-fetched static JSON
 // ═══════════════════════════════════════════════════════════
 
-// --- NDBC Hypoxia Stations (embedded data + live fetch fallback) ---
-async function loadNDBCStations() {
+// --- NDBC Hypoxia (existing latest.json) ---
+async function loadNDBCHypoxia() {
     setLoadingText('Loading NDBC hypoxia stations...');
     try {
         let data;
-        // Try live fetch first, fall back to embedded
-        try {
-            const resp = await fetch('data/latest.json?t=' + Date.now());
-            if (resp.ok) data = await resp.json();
-        } catch(e) { /* ignore fetch errors */ }
-
-        if (!data && typeof EMBEDDED_LATEST !== 'undefined') {
-            data = EMBEDDED_LATEST;
-        }
+        try { const r = await fetch('data/latest.json?t=' + Date.now()); if (r.ok) data = await r.json(); } catch(e) {}
+        if (!data && typeof EMBEDDED_LATEST !== 'undefined') data = EMBEDDED_LATEST;
         if (!data) return 0;
-
-        // Show last-updated time in stats bar
         if (data.updated) {
-            const d = new Date(data.updated);
-            const ago = Math.round((Date.now() - d.getTime()) / 3600000);
+            const d = new Date(data.updated), ago = Math.round((Date.now() - d.getTime()) / 3600000);
             const agoStr = ago < 1 ? 'just now' : ago < 24 ? ago + 'h ago' : Math.round(ago/24) + 'd ago';
-            document.getElementById('stat-updated').textContent = agoStr;
-            document.getElementById('stat-updated').title = 'Station data: ' + d.toUTCString();
+            setCount('stat-updated', agoStr);
+            document.getElementById('stat-updated').title = 'Data: ' + d.toUTCString();
         }
-
-        const group = L.layerGroup();
-        let count = 0;
-
+        const group = L.layerGroup(); let count = 0;
         data.stations.forEach(s => {
-            if (!s.lat || !s.lon) return;
-            count++;
-
-            const hasModel = s.has_model;
-            const hasDO = s.current && s.current.do != null;
+            if (!s.lat || !s.lon) return; count++;
+            const hasModel = s.has_model, hasDO = s.current && s.current.do != null;
             const temp = s.current && s.current.temp != null ? s.current.temp.toFixed(1) + '°C' : '—';
             const sal = s.current && s.current.sal != null ? s.current.sal.toFixed(1) + ' psu' : '—';
             const doVal = hasDO ? s.current.do.toFixed(2) + ' mg/L' : '—';
-
-            const color = hasDO && s.current.do <= 2 ? '#ef4444'
-                : hasDO && s.current.do <= 4 ? '#f59e0b'
-                : hasModel ? '#facc15' : '#94a3b8';
-
-            const marker = L.circleMarker([s.lat, s.lon], {
-                radius: hasModel ? 7 : 5,
-                color: color,
-                fillColor: color,
-                fillOpacity: 0.8,
-                weight: hasModel ? 2 : 1,
-            }).addTo(group);
-
-            const engine = s.model_type === 'timesfm' ? '<span style="color:#c084fc">TimesFM</span>'
-                : s.model_type === 'xgboost' ? '<span style="color:#60a5fa">XGBoost</span>' : '';
-
-            // Build prediction rows
+            const color = hasDO && s.current.do <= 2 ? '#ef4444' : hasDO && s.current.do <= 4 ? '#f59e0b' : hasModel ? '#facc15' : '#94a3b8';
+            const marker = L.circleMarker([s.lat, s.lon], { radius: hasModel ? 7 : 5, color, fillColor: color, fillOpacity: 0.8, weight: hasModel ? 2 : 1 }).addTo(group);
+            const engine = s.model_type === 'timesfm' ? '<span style="color:#c084fc">TimesFM</span>' : s.model_type === 'xgboost' ? '<span style="color:#60a5fa">XGBoost</span>' : '';
             let predHTML = '';
             if (s.predictions && Object.keys(s.predictions).length > 0) {
                 predHTML = '<div style="margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.08)">';
                 for (const [lead, p] of Object.entries(s.predictions)) {
                     const pct = (p.prob * 100).toFixed(0);
-                    const riskColor = p.risk === 'high' ? '#ef4444' : p.risk === 'moderate' ? '#f59e0b' : '#22c55e';
-                    predHTML += `<div style="font-size:11px;margin-top:3px">${lead}: <span style="color:${riskColor};font-weight:600">${pct}%</span> <span style="color:#64748b">(${p.engine})</span></div>`;
+                    const rc = p.risk === 'high' ? '#ef4444' : p.risk === 'moderate' ? '#f59e0b' : '#22c55e';
+                    predHTML += `<div style="font-size:11px;margin-top:3px">${lead}: <span style="color:${rc};font-weight:600">${pct}%</span> <span style="color:#64748b">(${p.engine || s.model_type || ''})</span></div>`;
                 }
                 predHTML += '</div>';
             }
-
-            marker.bindPopup(`
-                <div style="font-weight:600;font-size:14px;margin-bottom:4px">${s.id} ${engine}</div>
+            marker.bindPopup(`<div style="font-weight:600;font-size:14px;margin-bottom:4px">${s.id} ${engine}</div>
                 <div style="color:#94a3b8;font-size:11px;margin-bottom:8px">${s.name || ''}</div>
                 <div style="font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8">
-                    Temp: <span style="color:#38bdf8">${temp}</span><br>
-                    Sal: ${sal}<br>
-                    DO: <span style="color:${hasDO && s.current.do <= 2 ? '#ef4444' : '#22c55e'}">${doVal}</span>
-                </div>
-                ${predHTML}
-            `, { className: 'dark-popup' });
+                Temp: <span style="color:#38bdf8">${temp}</span><br>Sal: ${sal}<br>
+                DO: <span style="color:${hasDO && s.current.do <= 2 ? '#ef4444' : '#22c55e'}">${doVal}</span></div>${predHTML}`);
         });
-
         leafletLayers.ndbc = group;
         if (layerState.ndbc) group.addTo(map);
-        document.getElementById('ndbc-count').textContent = count;
-        totalSensors += count;
+        setCount('ndbc-count', count); totalSensors += count;
         return count;
-    } catch (e) {
-        console.error('NDBC load failed:', e);
-        return 0;
-    }
+    } catch (e) { console.error('NDBC hypoxia load failed:', e); return 0; }
 }
 
-// --- CO-OPS Tidal Current Stations ---
+// --- NDBC Weather Buoys (from AQUAVIEW via ndbc_met.json) ---
+async function loadNDBCMet() {
+    setLoadingText('Loading NDBC weather buoys...');
+    try {
+        const r = await fetch('data/ndbc_met.json?t=' + Date.now());
+        if (!r.ok) return 0;
+        const data = await r.json();
+        ndbcMetData = data;  // Cache for wind barbs
+        const group = L.layerGroup(); let count = 0;
+        (data.buoys || []).forEach(b => {
+            if (!b.lat || !b.lon) return; count++;
+            const c = b.current || {};
+            const marker = L.circleMarker([b.lat, b.lon], {
+                radius: 4, color: '#fbbf24', fillColor: '#fbbf24', fillOpacity: 0.5, weight: 1
+            }).addTo(group);
+            const wspd = c.wspd != null ? c.wspd.toFixed(1) + ' m/s' : '—';
+            const wdir = c.wdir != null ? c.wdir + '°' : '—';
+            const wvht = c.wvht != null ? c.wvht.toFixed(1) + ' m' : '—';
+            const wtmp = c.wtmp != null ? c.wtmp.toFixed(1) + '°C' : '—';
+            const pres = c.pres != null ? c.pres.toFixed(1) + ' hPa' : '—';
+            marker.bindPopup(`<div style="font-weight:600;font-size:13px">${b.title || b.id}</div>
+                <div style="color:#94a3b8;font-size:11px;margin-bottom:6px">NDBC ${b.id}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7">
+                Wind: <span style="color:#fbbf24">${wspd}</span> @ ${wdir}<br>
+                Waves: <span style="color:#60a5fa">${wvht}</span><br>
+                SST: <span style="color:#f97316">${wtmp}</span><br>
+                Pressure: ${pres}</div>
+                <div style="color:#64748b;font-size:10px;margin-top:4px">Vars: ${(b.vars||[]).slice(0,5).join(', ')}</div>`);
+        });
+        leafletLayers.ndbc_met = group;
+        if (layerState.ndbc_met) group.addTo(map);
+        setCount('ndbc-met-count', count); totalSensors += count;
+        return count;
+    } catch (e) { console.error('NDBC met load failed:', e); return 0; }
+}
+
+// --- CO-OPS Tidal Stations (from AQUAVIEW via coops.json) ---
 async function loadCOOPS() {
     setLoadingText('Loading CO-OPS tidal stations...');
-
-    const stations = [
-        {id:'t04010',name:'Egmont Channel LB 9',lat:27.604,lon:-82.867},
-        {id:'t03010',name:'Port Manatee',lat:27.664,lon:-82.599},
-        {id:'t02010',name:'Old Port Tampa',lat:27.863,lon:-82.554},
-        {id:'t01010',name:'Sunshine Skyway Bridge',lat:27.621,lon:-82.655},
-        {id:'sn0801',name:'Cheniere LNG, TX',lat:29.742,lon:-93.874},
-        {id:'CAL0331',name:'Calcasieu Channel',lat:29.767,lon:-93.342},
-        {id:'sn0901',name:'Sabine Pass North',lat:29.978,lon:-93.884},
-        {id:'sn0902',name:'Sabine Pass',lat:29.729,lon:-93.870},
-        {id:'sn0903',name:'Port Arthur Canal',lat:29.867,lon:-93.931},
-        {id:'SBP0401',name:'Sabine Front Range',lat:29.752,lon:-93.868},
-        {id:'cs0101',name:'Atchafalaya Bar',lat:29.375,lon:-91.379},
-        {id:'SBP0101',name:'West Port Arthur',lat:29.851,lon:-93.998},
-        {id:'SBP0201',name:'Beaumont Turning Basin',lat:30.022,lon:-94.087},
-        {id:'SBP0301',name:'Rainbow Bridge',lat:29.977,lon:-93.882},
-        {id:'CAL0301',name:'Lake Charles',lat:30.185,lon:-93.229},
-        {id:'CAL0201',name:'Devil Elbow',lat:30.044,lon:-93.283},
-        {id:'CAL0101',name:'Calcasieu Pass',lat:29.768,lon:-93.342},
-        {id:'bb0101',name:'Barataria Pass',lat:29.275,lon:-89.945},
-        {id:'mc0101',name:'Mississippi River Delta',lat:29.069,lon:-89.219},
-        {id:'FMB0401',name:'San Carlos Bay',lat:26.486,lon:-81.972},
-        {id:'FMB0301',name:'Shell Point',lat:26.568,lon:-81.862},
-        {id:'FMB0101',name:'Fort Myers Bridge',lat:26.649,lon:-81.869},
-        {id:'g06010',name:'Galveston Bay',lat:29.357,lon:-94.725},
-        {id:'g07010',name:'Galveston Channel',lat:29.320,lon:-94.770},
-        {id:'cc0101',name:'Corpus Christi Ship Channel',lat:27.841,lon:-97.073},
-        {id:'cc0301',name:'Port Aransas',lat:27.837,lon:-97.039},
-        {id:'PCT0101',name:'Port Canaveral',lat:28.408,lon:-80.602},
-        {id:'JKV0301',name:'St. Johns River',lat:30.401,lon:-81.430},
-    ];
-
-    const group = L.layerGroup();
-    stations.forEach(s => {
-        const marker = L.circleMarker([s.lat, s.lon], {
-            radius: 5, color: '#fb7185', fillColor: '#fb7185',
-            fillOpacity: 0.7, weight: 1.5,
-        }).addTo(group);
-
-        marker.bindPopup(`
-            <div style="font-weight:600;font-size:13px;margin-bottom:2px">${s.name}</div>
-            <div style="color:#94a3b8;font-size:11px">CO-OPS ${s.id}</div>
-            <div style="color:#fb7185;font-size:11px;margin-top:4px">6-min tidal currents</div>
-        `);
-    });
-
-    leafletLayers.coops = group;
-    if (layerState.coops) group.addTo(map);
-    document.getElementById('coops-count').textContent = stations.length;
-    totalSensors += stations.length;
-    return stations.length;
+    try {
+        const r = await fetch('data/coops.json?t=' + Date.now());
+        if (!r.ok) return 0;
+        const data = await r.json();
+        const group = L.layerGroup(); let count = 0;
+        (data.stations || []).forEach(s => {
+            if (!s.lat || !s.lon) return; count++;
+            const marker = L.circleMarker([s.lat, s.lon], {
+                radius: 4, color: '#fb7185', fillColor: '#fb7185', fillOpacity: 0.6, weight: 1
+            }).addTo(group);
+            const wl = s.current && s.current.wl != null ? s.current.wl.toFixed(2) + ' m' : '—';
+            marker.bindPopup(`<div style="font-weight:600;font-size:13px">${s.title || s.id}</div>
+                <div style="color:#94a3b8;font-size:11px">CO-OPS ${s.id}</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:6px">Water Level: <span style="color:#fb7185">${wl}</span> MLLW</div>
+                <div style="color:#64748b;font-size:10px;margin-top:4px">Vars: ${(s.vars||[]).slice(0,4).join(', ')}</div>`);
+        });
+        leafletLayers.coops = group;
+        if (layerState.coops) group.addTo(map);
+        setCount('coops-count', count); totalSensors += count;
+        return count;
+    } catch (e) { console.error('CO-OPS load failed:', e); return 0; }
 }
 
-// --- IOOS Sensor Network ---
+// --- IOOS Sensor Network (from AQUAVIEW via ioos_sensors.json) ---
 async function loadIOOS() {
     setLoadingText('Loading IOOS sensor network...');
     try {
-        const resp = await fetch('https://api.tidesandcurrents.noaa.gov/mdapi/prod/webapi/stations.json?type=waterlevels&units=metric');
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const data = await resp.json();
-
-        const group = L.layerGroup();
-        let count = 0;
-
-        (data.stations || []).forEach(s => {
-            const lat = parseFloat(s.lat);
-            const lon = parseFloat(s.lng);
-            if (isNaN(lat) || isNaN(lon)) return;
-            if (lat < 24 || lat > 31.5 || lon < -98 || lon > -80) return;
-
-            count++;
-            const marker = L.circleMarker([lat, lon], {
-                radius: 3, color: '#2dd4bf', fillColor: '#2dd4bf',
-                fillOpacity: 0.5, weight: 0.8,
+        const r = await fetch('data/ioos_sensors.json?t=' + Date.now());
+        if (!r.ok) return 0;
+        const data = await r.json();
+        const group = L.layerGroup(); let count = 0;
+        (data.sensors || []).forEach(s => {
+            if (!s.lat || !s.lon) return; count++;
+            const marker = L.circleMarker([s.lat, s.lon], {
+                radius: 3, color: '#2dd4bf', fillColor: '#2dd4bf', fillOpacity: 0.4, weight: 0.8
             }).addTo(group);
-
-            marker.bindPopup(`
-                <div style="font-weight:600;font-size:13px">${s.name || s.id}</div>
-                <div style="color:#94a3b8;font-size:11px">Station ${s.id}</div>
-                <div style="color:#2dd4bf;font-size:11px;margin-top:4px">${s.state || ''} • Water levels</div>
-            `);
+            marker.bindPopup(`<div style="font-weight:600;font-size:13px">${s.title || s.id}</div>
+                <div style="color:#94a3b8;font-size:11px;margin-bottom:4px">${s.org || 'IOOS'}</div>
+                <div style="color:#2dd4bf;font-size:11px">Variables: ${(s.vars||[]).slice(0,6).join(', ')}</div>`);
         });
-
         leafletLayers.ioos = group;
         if (layerState.ioos) group.addTo(map);
-        document.getElementById('ioos-count').textContent = count;
-        totalSensors += count;
+        setCount('ioos-count', count); totalSensors += count;
         return count;
-    } catch (e) {
-        console.error('IOOS load failed:', e);
-        const group = L.layerGroup();
-        leafletLayers.ioos = group;
-        document.getElementById('ioos-count').textContent = '0';
-        return 0;
-    }
+    } catch (e) { console.error('IOOS load failed:', e); return 0; }
 }
 
-// --- IOOS Glider Tracks (real missions from IOOS Glider DAC) ---
+// --- Glider Tracks (from AQUAVIEW via gliders.json) ---
 async function loadGliders() {
     setLoadingText('Loading glider missions...');
+    try {
+        const r = await fetch('data/gliders.json?t=' + Date.now());
+        if (!r.ok) return 0;
+        const data = await r.json();
+        const group = L.layerGroup(); let count = 0;
+        const colors = ['#c084fc','#60a5fa','#f472b6','#fb923c','#a78bfa','#34d399','#fbbf24','#818cf8'];
+        (data.gliders || []).forEach((g, i) => {
+            if (!g.track || g.track.length === 0) return; count++;
+            const color = colors[i % colors.length];
+            const latLngs = g.track.map(c => [c[1], c[0]]);  // [lat, lon]
+            if (latLngs.length > 1) {
+                L.polyline(latLngs, { color, weight: 2, opacity: 0.6, dashArray: '6 3' }).addTo(group);
+            }
+            // Current position (last point)
+            const last = latLngs[latLngs.length - 1];
+            const isRecent = g.end && (Date.now() - new Date(g.end).getTime()) < 30 * 86400000;
+            L.circleMarker(last, {
+                radius: isRecent ? 7 : 5, color, fillColor: color,
+                fillOpacity: isRecent ? 1 : 0.7, weight: isRecent ? 2.5 : 1.5
+            }).addTo(group).bindPopup(`<div style="font-weight:600;color:${color};font-size:13px">${g.title || g.id}</div>
+                <div style="color:#94a3b8;font-size:11px;margin-bottom:4px">${g.start ? g.start.slice(0,10) : ''}${g.end ? ' → ' + g.end.slice(0,10) : ''}</div>
+                <div style="color:#64748b;font-size:10px">Track: ${g.track.length} pts</div>
+                <div style="color:#64748b;font-size:10px">Vars: ${(g.vars||[]).slice(0,5).join(', ')}</div>`);
+        });
+        leafletLayers.gliders = group;
+        if (layerState.gliders) group.addTo(map);
+        setCount('glider-count', count);
+        return count;
+    } catch (e) { console.error('Gliders load failed:', e); return 0; }
+}
 
-    const gliderMissions = [
-        {
-            id: 'usf-jaialai-20260210T0000',
-            name: 'USF Jaialai',
-            inst: 'Univ. South Florida',
-            dates: 'Feb 10–22, 2026',
-            status: 'Active',
-            color: '#c084fc',
-            track: [[27.825,-91.372],[27.862,-91.216],[27.914,-90.949],[28.016,-90.433],
-                    [28.129,-90.125],[28.234,-89.988],[28.346,-90.123],[28.412,-90.568],
-                    [28.399,-91.035],[28.288,-91.246],[28.165,-91.123],[28.043,-90.877],
-                    [27.923,-90.543],[27.877,-90.234]]
-        },
-        {
-            id: 'unit_307-20240607T0000',
-            name: 'TAMU Unit 307',
-            inst: 'Texas A&M University',
-            dates: 'Jun–Jul 2024',
-            status: 'Completed',
-            color: '#60a5fa',
-            track: [[27.554,-95.233],[27.523,-95.146],[27.412,-94.877],[27.235,-94.432],
-                    [26.988,-93.877],[26.543,-92.346],[26.123,-91.568],[26.877,-90.988],
-                    [27.432,-91.235],[28.012,-91.877],[28.568,-92.654],[29.123,-93.432],
-                    [29.346,-94.123],[28.988,-95.012]]
-        },
-        {
-            id: 'sedna-20241001T0000',
-            name: 'UL Lafayette Sedna',
-            inst: 'Univ. Louisiana at Lafayette',
-            dates: 'Oct–Nov 2024',
-            status: 'Completed',
-            color: '#f472b6',
-            track: [[28.776,-88.332],[28.812,-88.215],[28.846,-88.023],[28.879,-87.877],
-                    [28.901,-87.654],[28.923,-87.568],[28.946,-87.432],[28.957,-87.346],
-                    [28.968,-87.235],[28.979,-87.123],[29.001,-87.965],[29.005,-87.866]]
-        },
-        {
-            id: 'mote-dora-20211012T1200',
-            name: 'Mote-Dora GOMIX',
-            inst: 'Texas A&M / GCOOS',
-            dates: 'Oct 12–15, 2021',
-            status: 'Completed',
-            color: '#fb923c',
-            track: [[27.228,-82.802],[27.226,-82.793],[27.220,-82.765],[27.205,-82.723],
-                    [27.188,-82.688],[27.123,-82.654],[27.046,-82.669],[26.988,-82.673],
-                    [26.941,-82.667]]
-        },
-        {
-            id: 'Stommel-20200813T1200',
-            name: 'Stommel Hurricane DA',
-            inst: 'Texas A&M / GCOOS',
-            dates: 'Aug–Oct 2020',
-            status: 'Completed',
-            color: '#a78bfa',
-            track: [[27.716,-93.992],[27.685,-93.877],[27.523,-93.654],[27.288,-93.432],
-                    [26.923,-93.123],[26.612,-92.877],[26.457,-92.568],[26.346,-92.235],
-                    [26.423,-91.988],[26.589,-91.543],[26.746,-91.123],[26.812,-90.765],
-                    [26.857,-95.379]]
+// --- Incidents (from AQUAVIEW via incidents.json) ---
+async function loadIncidents() {
+    setLoadingText('Loading incident reports...');
+    try {
+        const r = await fetch('data/incidents.json?t=' + Date.now());
+        if (!r.ok) return 0;
+        const data = await r.json();
+        const group = L.layerGroup(); let count = 0;
+        (data.incidents || []).forEach(inc => {
+            if (!inc.lat || !inc.lon) return; count++;
+            const daysAgo = inc.date ? Math.round((Date.now() - new Date(inc.date).getTime()) / 86400000) : null;
+            const opacity = daysAgo != null && daysAgo < 30 ? 0.9 : daysAgo != null && daysAgo < 180 ? 0.6 : 0.35;
+            const radius = daysAgo != null && daysAgo < 30 ? 8 : daysAgo != null && daysAgo < 180 ? 6 : 4;
+
+            // Triangle-ish marker using DivIcon
+            const marker = L.circleMarker([inc.lat, inc.lon], {
+                radius, color: '#ef4444', fillColor: '#ef4444', fillOpacity: opacity, weight: 1.5
+            }).addTo(group);
+
+            const dateStr = inc.date ? new Date(inc.date).toLocaleDateString() : 'Unknown date';
+            marker.bindPopup(`<div style="font-weight:600;font-size:13px;color:#ef4444">⚠ ${inc.title || 'Incident'}</div>
+                <div style="color:#94a3b8;font-size:11px;margin-bottom:6px">${dateStr}${daysAgo != null ? ' (' + daysAgo + 'd ago)' : ''}</div>
+                <div style="font-size:12px;color:#cbd5e1;line-height:1.5">${inc.desc || ''}</div>
+                ${inc.url ? '<div style="margin-top:6px"><a href="' + inc.url + '" target="_blank" style="color:#38bdf8;font-size:11px">View details →</a></div>' : ''}`);
+        });
+        leafletLayers.incidents = group;
+        if (layerState.incidents) group.addTo(map);
+        setCount('incidents-count', count);
+        return count;
+    } catch (e) { console.error('Incidents load failed:', e); return 0; }
+}
+
+// --- PMEL Hurricane Probes ---
+async function loadPMEL() {
+    try {
+        const r = await fetch('data/pmel.json?t=' + Date.now());
+        if (!r.ok) return 0;
+        const data = await r.json();
+        const group = L.layerGroup(); let count = 0;
+        (data.probes || []).forEach(p => {
+            if (!p.lat || !p.lon) return; count++;
+            const marker = L.circleMarker([p.lat, p.lon], {
+                radius: 6, color: '#f472b6', fillColor: '#f472b6', fillOpacity: 0.7, weight: 1.5
+            }).addTo(group);
+            marker.bindPopup(`<div style="font-weight:600;font-size:13px;color:#f472b6">${p.title || p.id}</div>
+                <div style="color:#94a3b8;font-size:11px">${p.date ? new Date(p.date).toLocaleDateString() : ''}</div>
+                <div style="color:#64748b;font-size:10px;margin-top:4px">Vars: ${(p.vars||[]).join(', ')}</div>`);
+        });
+        leafletLayers.pmel = group;
+        if (layerState.pmel) group.addTo(map);
+        setCount('pmel-count', count);
+        return count;
+    } catch (e) { console.error('PMEL load failed:', e); return 0; }
+}
+
+// --- Drifters ---
+async function loadDrifters() {
+    try {
+        const r = await fetch('data/drifters.json?t=' + Date.now());
+        if (!r.ok) return 0;
+        const data = await r.json();
+        const group = L.layerGroup(); let count = 0;
+        const colors = ['#06b6d4','#0ea5e9','#22d3ee','#67e8f9'];
+        (data.drifters || []).forEach((d, i) => {
+            if (!d.track || d.track.length === 0) return; count++;
+            const latLngs = d.track.map(c => [c[1], c[0]]);
+            if (latLngs.length > 1) {
+                L.polyline(latLngs, { color: colors[i % colors.length], weight: 2, opacity: 0.5 }).addTo(group);
+            }
+            const last = latLngs[latLngs.length - 1];
+            L.circleMarker(last, { radius: 4, color: colors[i % colors.length], fillColor: colors[i % colors.length], fillOpacity: 0.8, weight: 1 }).addTo(group)
+                .bindPopup(`<div style="font-weight:600;font-size:13px">${d.title || d.id}</div>
+                    <div style="color:#94a3b8;font-size:11px">${d.count || 0} positions</div>`);
+        });
+        leafletLayers.drifters = group;
+        if (layerState.drifters) group.addTo(map);
+        setCount('drifters-count', count);
+        return count;
+    } catch (e) { console.error('Drifters load failed:', e); return 0; }
+}
+
+// ═══════════════════════════════════════════════════════════
+// WIND BARBS (Canvas overlay from NDBC met data)
+// ═══════════════════════════════════════════════════════════
+function renderWindBarbs() {
+    windCtx.clearRect(0, 0, windCanvas.width, windCanvas.height);
+    if (!layerState.wind || !ndbcMetData) return;
+
+    const zoom = map.getZoom();
+    const barbLen = Math.max(16, zoom * 3.5);
+
+    (ndbcMetData.buoys || []).forEach(b => {
+        if (!b.current || b.current.wspd == null || b.current.wdir == null) return;
+        const pt = map.latLngToContainerPoint([b.lat, b.lon]);
+        if (pt.x < -20 || pt.x > windCanvas.width + 20 || pt.y < -20 || pt.y > windCanvas.height + 20) return;
+
+        const wspd = b.current.wspd;  // m/s
+        const wdir = (b.current.wdir - 90) * Math.PI / 180;  // Convert to math angle
+
+        const kts = wspd * 1.94384;  // Convert to knots for barb convention
+        const endX = pt.x + Math.cos(wdir) * barbLen;
+        const endY = pt.y + Math.sin(wdir) * barbLen;
+
+        // Staff
+        windCtx.beginPath();
+        windCtx.moveTo(pt.x, pt.y);
+        windCtx.lineTo(endX, endY);
+        windCtx.strokeStyle = 'rgba(220, 220, 220, 0.7)';
+        windCtx.lineWidth = 1.2;
+        windCtx.stroke();
+
+        // Barbs (simplified: full barb = 10kt, half = 5kt, flag = 50kt)
+        let remaining = kts;
+        let barbPos = 0;
+        const perpX = -Math.sin(wdir) * barbLen * 0.35;
+        const perpY = Math.cos(wdir) * barbLen * 0.35;
+        const step = barbLen * 0.18;
+
+        // Flags (50kt)
+        while (remaining >= 50) {
+            const bx = endX - Math.cos(wdir) * barbPos;
+            const by = endY - Math.sin(wdir) * barbPos;
+            windCtx.beginPath();
+            windCtx.moveTo(bx, by);
+            windCtx.lineTo(bx + perpX, by + perpY);
+            windCtx.lineTo(bx - Math.cos(wdir) * step, by - Math.sin(wdir) * step);
+            windCtx.fillStyle = 'rgba(220, 220, 220, 0.7)';
+            windCtx.fill();
+            barbPos += step;
+            remaining -= 50;
         }
-    ];
+        // Full barbs (10kt)
+        while (remaining >= 10) {
+            const bx = endX - Math.cos(wdir) * barbPos;
+            const by = endY - Math.sin(wdir) * barbPos;
+            windCtx.beginPath();
+            windCtx.moveTo(bx, by);
+            windCtx.lineTo(bx + perpX, by + perpY);
+            windCtx.strokeStyle = 'rgba(220, 220, 220, 0.7)';
+            windCtx.lineWidth = 1;
+            windCtx.stroke();
+            barbPos += step;
+            remaining -= 10;
+        }
+        // Half barb (5kt)
+        if (remaining >= 5) {
+            const bx = endX - Math.cos(wdir) * barbPos;
+            const by = endY - Math.sin(wdir) * barbPos;
+            windCtx.beginPath();
+            windCtx.moveTo(bx, by);
+            windCtx.lineTo(bx + perpX * 0.5, by + perpY * 0.5);
+            windCtx.strokeStyle = 'rgba(220, 220, 220, 0.7)';
+            windCtx.lineWidth = 1;
+            windCtx.stroke();
+        }
 
-    const group = L.layerGroup();
-
-    gliderMissions.forEach(g => {
-        // Draw track line
-        const line = L.polyline(g.track.map(p => [p[0], p[1]]), {
-            color: g.color, weight: 2.5, opacity: 0.7,
-            dashArray: '8 4',
-        }).addTo(group);
-
-        // Start marker (smaller)
-        L.circleMarker(g.track[0], {
-            radius: 4, color: g.color, fillColor: g.color, fillOpacity: 0.9, weight: 1,
-        }).addTo(group).bindPopup(`
-            <div style="font-weight:600;color:${g.color};font-size:14px">${g.name}</div>
-            <div style="color:#94a3b8;font-size:11px">${g.inst}</div>
-            <div style="font-size:11px;margin-top:4px">${g.dates}</div>
-            <div style="color:#64748b;font-size:10px;margin-top:2px">Slocum Glider • CTD + O₂</div>
-            <div style="margin-top:4px">
-                <span style="font-size:10px;padding:2px 8px;border-radius:10px;background:${g.status==='Active'?'rgba(34,197,94,0.15)':'rgba(148,163,184,0.15)'};color:${g.status==='Active'?'#22c55e':'#94a3b8'}">${g.status}</span>
-            </div>
-            <div style="color:#475569;font-size:10px;margin-top:6px">Source: IOOS Glider DAC ERDDAP<br>ID: ${g.id}</div>
-        `);
-
-        // End marker (current position, bigger with pulsing ring for active)
-        const last = g.track[g.track.length - 1];
-        const endMarker = L.circleMarker(last, {
-            radius: g.status === 'Active' ? 8 : 6,
-            color: g.color, fillColor: g.color,
-            fillOpacity: g.status === 'Active' ? 1 : 0.8,
-            weight: g.status === 'Active' ? 3 : 2,
-        }).addTo(group);
-
-        if (g.status === 'Active') {
-            endMarker.bindTooltip(`${g.name} (live)`, {
-                permanent: true, direction: 'right', offset: [12, 0],
-                className: 'glider-tooltip'
-            });
+        // Circle at base for calm
+        if (kts < 3) {
+            windCtx.beginPath();
+            windCtx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+            windCtx.strokeStyle = 'rgba(220, 220, 220, 0.5)';
+            windCtx.lineWidth = 1;
+            windCtx.stroke();
         }
     });
+    setCount('wind-count', (ndbcMetData.buoys || []).filter(b => b.current && b.current.wspd != null).length);
+}
 
-    leafletLayers.gliders = group;
-    if (layerState.gliders) group.addTo(map);
-    document.getElementById('glider-count').textContent = gliderMissions.length;
-    return gliderMissions.length;
+// ═══════════════════════════════════════════════════════════
+// WAVE CIRCLES (pulsing proportional circles)
+// ═══════════════════════════════════════════════════════════
+function renderWaveCircles() {
+    if (!layerState.waves || !ndbcMetData) return;
+    // Remove old wave layer if exists
+    if (leafletLayers.waves) map.removeLayer(leafletLayers.waves);
+    const group = L.layerGroup(); let count = 0;
+    (ndbcMetData.buoys || []).forEach(b => {
+        if (!b.current || b.current.wvht == null) return; count++;
+        const wvht = b.current.wvht;
+        const radius = Math.max(3, Math.min(15, wvht * 4));
+        const color = wvht < 1 ? '#60a5fa' : wvht < 2 ? '#38bdf8' : wvht < 3 ? '#f59e0b' : '#ef4444';
+        L.circleMarker([b.lat, b.lon], {
+            radius, color, fillColor: color, fillOpacity: 0.4, weight: 1.5
+        }).addTo(group).bindPopup(`<div style="font-weight:600;font-size:13px">${b.title || b.id}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:6px">
+            Wave Height: <span style="color:${color};font-weight:600">${wvht.toFixed(1)} m</span><br>
+            ${b.current.dpd != null ? 'Period: ' + b.current.dpd.toFixed(0) + ' s' : ''}</div>`);
+    });
+    leafletLayers.waves = group;
+    if (layerState.waves) group.addTo(map);
+    setCount('wave-count', count);
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1264,29 +887,22 @@ async function loadGliders() {
 // ═══════════════════════════════════════════════════════════
 function toggleLayer(name) {
     layerState[name] = !layerState[name];
-
     const el = document.querySelector(`.layer-toggle[data-layer="${name}"]`);
-    el.classList.toggle('active', layerState[name]);
+    if (el) el.classList.toggle('active', layerState[name]);
 
     if (name === 'currents') {
         if (!layerState.currents) clearCanvas();
+    } else if (name === 'wind') {
+        renderWindBarbs();
+    } else if (name === 'waves') {
+        renderWaveCircles();
+        if (!layerState.waves && leafletLayers.waves) map.removeLayer(leafletLayers.waves);
     } else if (leafletLayers[name]) {
-        if (layerState[name]) {
-            leafletLayers[name].addTo(map);
-        } else {
-            map.removeLayer(leafletLayers[name]);
-        }
+        if (layerState[name]) leafletLayers[name].addTo(map);
+        else map.removeLayer(leafletLayers[name]);
     }
 }
-
 window.toggleLayer = toggleLayer;
-
-// ═══════════════════════════════════════════════════════════
-// LOADING
-// ═══════════════════════════════════════════════════════════
-function setLoadingText(text) {
-    document.getElementById('loading-text').textContent = text;
-}
 
 // ═══════════════════════════════════════════════════════════
 // INIT
@@ -1294,17 +910,25 @@ function setLoadingText(text) {
 async function init() {
     initMap();
 
-    const [hasCurrents, ndbcCount, coopsCount, ioosCount] = await Promise.all([
+    // Phase 1: Core data (parallel)
+    const [hasCurrents, ndbcCount] = await Promise.all([
         fetchCurrents(),
-        loadNDBCStations(),
-        loadCOOPS(),
-        loadIOOS(),
+        loadNDBCHypoxia(),
     ]);
 
-    // Load gliders (doesn't need to block)
-    loadGliders();
+    // Phase 2: AQUAVIEW layers (parallel)
+    setLoadingText('Loading AQUAVIEW collections...');
+    const results = await Promise.all([
+        loadNDBCMet(),
+        loadCOOPS(),
+        loadIOOS(),
+        loadGliders(),
+        loadIncidents(),
+        loadPMEL(),
+        loadDrifters(),
+    ]);
 
-    document.getElementById('stat-sensors').textContent = totalSensors.toLocaleString();
+    setCount('stat-sensors', totalSensors.toLocaleString());
 
     if (hasCurrents) {
         setLoadingText('Initializing particle system...');
@@ -1312,17 +936,14 @@ async function init() {
         requestAnimationFrame(animateParticles);
     }
 
-    setTimeout(() => {
-        document.getElementById('loading').classList.add('hidden');
-    }, 600);
+    // Render wind/waves if enabled
+    renderWindBarbs();
+    renderWaveCircles();
+
+    setTimeout(() => { document.getElementById('loading').classList.add('hidden'); }, 600);
 }
 
 init();
-</script>
-
-<!-- Embedded station data (fallback when not served from directory with data/latest.json) -->
-<script>
-const EMBEDDED_LATEST = {"updated":"2026-02-22T15:43:10Z","update_interval_hours":6,"stations":[{"id":"MNBF1","name":"Manatee Bay, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.6,"sal":31.6},"last_observation":"2026-02-22","days_of_data":46,"lat":25.239,"lon":-80.422,"model_type":null},{"id":"APQF1","name":"Apalachicola, FL","has_model":true,"has_realtime":false,"status":"active","current":{"temp":22.4,"sal":7.6,"do":7.8,"turbidity":21.0,"ph":8.1},"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.52},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.52},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.52},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.52}},"lat":29.727,"lon":-84.98,"timesfm_benchmark":{"1d":{"auc_roc":0.751,"mae":1.13},"3d":{"auc_roc":0.685,"mae":1.35},"5d":{"auc_roc":0.63,"mae":1.45},"7d":{"auc_roc":0.633,"mae":1.52}},"model_type":"timesfm","n_days":1258,"n_hyp_days":77,"last_observation":"2026-02-22"},{"id":"WPLF1","name":"Watson Place, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.6,"sal":37.3},"last_observation":"2026-02-22","days_of_data":40,"lat":25.71,"lon":-81.249,"model_type":null},{"id":"JBYF1","name":"Joe Bay, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":25.5,"sal":31.1},"last_observation":"2026-02-22","days_of_data":45,"lat":25.224,"lon":-80.541,"model_type":null},{"id":"BSKF1","name":"Big Sable Creek, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":22.8,"sal":37.5},"last_observation":"2026-02-22","days_of_data":46,"lat":25.266,"lon":-81.162,"model_type":null},{"id":"MDKF1","name":"Middle Key, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.5,"sal":32.9},"last_observation":"2026-02-22","days_of_data":46,"lat":25.289,"lon":-80.396,"model_type":null},{"id":"WIWF1","name":"Willy Willy, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":23.9,"sal":25.3},"last_observation":"2026-02-22","days_of_data":46,"lat":25.587,"lon":-81.044,"model_type":null},{"id":"41069","name":"Ponce de Leon Inlet, FL (PNC)","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":17.4,"sal":35.1},"last_observation":"2026-02-22","days_of_data":46,"lat":29.289,"lon":-80.803,"model_type":null},{"id":"TPEF1","name":"Tarpon Bay East, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.9,"sal":20.3},"last_observation":"2026-02-22","days_of_data":46,"lat":25.41,"lon":-80.964,"model_type":null},{"id":"TBYF1","name":"Terrapin Bay, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.9,"sal":36.5},"last_observation":"2026-02-22","days_of_data":46,"lat":25.155,"lon":-80.722,"model_type":null},{"id":"HREF1","name":"Harney River, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":23.6,"sal":33.5},"last_observation":"2026-02-22","days_of_data":46,"lat":25.424,"lon":-81.06,"model_type":null},{"id":"JKYF1","name":"Johnson Key, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":25.0,"sal":38.2},"last_observation":"2026-02-22","days_of_data":46,"lat":25.053,"lon":-80.904,"model_type":null},{"id":"LBSF1","name":"Little Blackwater, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.9,"sal":30.6},"last_observation":"2026-02-22","days_of_data":46,"lat":25.214,"lon":-80.432,"model_type":null},{"id":"LRIF1","name":"Lane River, FL ","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":25.5,"sal":20.0},"last_observation":"2026-02-22","days_of_data":46,"lat":25.284,"lon":-80.894,"model_type":null},{"id":"GBIF1","name":"Gunboat Island, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":23.5,"sal":32.4},"last_observation":"2026-02-22","days_of_data":46,"lat":25.378,"lon":-81.029,"model_type":null},{"id":"TCVF1","name":"Trout Cove, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.7,"sal":30.6},"last_observation":"2026-02-22","days_of_data":46,"lat":25.213,"lon":-80.533,"model_type":null},{"id":"GBHM6","name":"Bayou Heron, Grand Bay Reserve, MS","has_model":true,"has_realtime":true,"status":"active","current":{"do":4.9,"temp":18.6,"sal":19.0,"turbidity":14.0,"ph":6.9},"last_observation":"2026-02-22","days_of_data":46,"currently_hypoxic":false,"predictions":{"1d":{"prob":0.0322,"risk":"low"},"3d":{"prob":0.09,"risk":"low"},"5d":{"prob":0.1474,"risk":"low"},"7d":{"prob":0.1373,"risk":"low"}},"metrics":{"1":{"auc_roc":0,"auc_pr":0,"f1":0.0},"3":{"auc_roc":0,"auc_pr":0,"f1":0.0},"5":{"auc_roc":0,"auc_pr":0,"f1":0.0},"7":{"auc_roc":0,"auc_pr":0,"f1":0.0}},"lat":30.418,"lon":-88.405,"timesfm_benchmark":{"1d":{"auc_roc":0.912,"mae":0.88},"3d":{"auc_roc":0.857,"mae":1.2},"5d":{"auc_roc":0.821,"mae":1.34},"7d":{"auc_roc":0.805,"mae":1.42}},"model_type":"xgboost","n_days":2465,"n_hyp_days":469},{"id":"BWSF1","name":"Blackwater Sound, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.8,"sal":32.0},"last_observation":"2026-02-22","days_of_data":46,"lat":25.178,"lon":-80.438,"model_type":null},{"id":"BDVF1","name":"Broad River, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.9,"sal":21.2},"last_observation":"2026-02-22","days_of_data":46,"lat":25.478,"lon":-80.989,"model_type":null},{"id":"41068","name":"Fort Pierce, FL (FTP)","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":22.2,"sal":36.4},"last_observation":"2026-02-22","days_of_data":45,"lat":27.593,"lon":-80.189,"model_type":null},{"id":"ADBF1","name":"Dry Bar, Apalachicola Reserve, FL","has_model":true,"has_realtime":true,"status":"active","current":{"do":7.3,"temp":21.3,"sal":21.8,"turbidity":36.0,"ph":8.2},"last_observation":"2026-02-22","days_of_data":14,"currently_hypoxic":false,"lat":29.675,"lon":-85.058,"model_type":"timesfm","timesfm_benchmark":{"1d":{"mae":1.46,"correlation":0.716},"3d":{"mae":2.23,"correlation":0.238},"5d":{"mae":2.4,"correlation":0.04},"7d":{"mae":2.85,"correlation":-0.382}},"n_days":74,"n_hyp_days":0,"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.3},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.3},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.3},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.3}}},{"id":"CNBF1","name":"Cannon Bay, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":25.2,"sal":33.7},"last_observation":"2026-02-22","days_of_data":46,"lat":25.702,"lon":-81.186,"model_type":null},{"id":"42026","name":"C22 - Loop Current Pressure Point Buoy, 70m Isobath","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":23.5,"sal":36.9},"last_observation":"2026-02-22","days_of_data":46,"lat":25.171,"lon":-83.475,"model_type":null},{"id":"CANF1","name":"Cane Patch, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":23.8,"sal":11.8},"last_observation":"2026-02-22","days_of_data":46,"lat":25.422,"lon":-80.942,"model_type":null},{"id":"BOBF1","name":"Bob Allen, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.5,"sal":36.3},"last_observation":"2026-02-22","days_of_data":46,"lat":25.027,"lon":-80.681,"model_type":null},{"id":"FRKF1","name":"Fort King, FL","has_model":true,"has_realtime":false,"status":"historical_only","current":null,"predictions":null,"model_type":"timesfm","timesfm_benchmark":{"1d":{"auc_roc":0.832,"mae":1.46,"correlation":0.668},"3d":{"auc_roc":0.73,"mae":2.09,"correlation":0.341},"5d":{"auc_roc":0.579,"mae":2.35,"correlation":0.076},"7d":{"auc_roc":0.41,"mae":2.55,"correlation":-0.119}},"n_days":616,"n_hyp_days":160},{"id":"HCEF1","name":"Highway Creek, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.4,"sal":31.3},"last_observation":"2026-02-22","days_of_data":46,"lat":25.254,"lon":-80.444,"model_type":null},{"id":"CWWT2","name":"Copano Bay West, Mission-Aransas Reserve, TX","has_model":false,"has_realtime":true,"status":"active","current":{"do":7.5,"temp":20.3,"sal":35.4,"turbidity":4.0,"ph":8.2},"last_observation":"2026-02-12","days_of_data":2,"currently_hypoxic":false,"lat":28.084,"lon":-97.201,"model_type":null},{"id":"TRRF1","name":"Taylor River, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.9,"sal":24.1},"last_observation":"2026-02-22","days_of_data":46,"lat":25.217,"lon":-80.65,"model_type":null},{"id":"WWEF1","name":"Whitewater Bay-East, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":25.6,"sal":17.7},"last_observation":"2026-02-22","days_of_data":46,"lat":25.232,"lon":-80.938,"model_type":null},{"id":"CWAF1","name":"Clear Water Pass, FL ","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":25.5,"sal":29.2},"last_observation":"2026-02-22","days_of_data":46,"lat":25.297,"lon":-81.013,"model_type":null},{"id":"THRF1","name":"Thursday Point, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.6,"sal":32.1},"last_observation":"2026-02-22","days_of_data":46,"lat":25.203,"lon":-80.372,"model_type":null},{"id":"MUKF1","name":"Murray Key, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.0,"sal":38.1},"last_observation":"2026-02-22","days_of_data":46,"lat":25.106,"lon":-80.942,"model_type":null},{"id":"GBTF1","name":"Garfield Bight, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.6,"sal":41.5},"last_observation":"2026-02-22","days_of_data":46,"lat":25.167,"lon":-80.801,"model_type":null},{"id":"DKKF1","name":"Duck Key, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.7,"sal":31.7},"last_observation":"2026-02-22","days_of_data":46,"lat":25.18,"lon":-80.49,"model_type":null},{"id":"KATA1","name":"Katrina Cut, AL","has_model":true,"has_realtime":false,"status":"historical_only","current":null,"predictions":null,"lat":30.335,"lon":-88.223,"timesfm_benchmark":{"1d":{"auc_roc":0.851,"mae":1.14},"3d":{"auc_roc":0.719,"mae":1.44},"5d":{"auc_roc":0.622,"mae":1.55},"7d":{"auc_roc":0.571,"mae":1.58}},"xgboost_benchmark":{"1d":{"auc_roc":0.942},"3d":{"auc_roc":0.737},"5d":{"auc_roc":0.743},"7d":{"auc_roc":0.792}},"model_type":"xgboost","n_days":2704,"n_hyp_days":110},{"id":"MBLA1","name":"Middle Bay Light, AL","has_model":true,"has_realtime":false,"status":"historical_only","current":null,"predictions":null,"lat":30.437,"lon":-88.012,"timesfm_benchmark":{"1d":{"auc_roc":0.837,"mae":0.62},"3d":{"auc_roc":0.755,"mae":0.75},"5d":{"auc_roc":0.653,"mae":0.82},"7d":{"auc_roc":0.683,"mae":0.9}},"xgboost_benchmark":{"1d":{"auc_roc":0.698},"3d":{"auc_roc":0.555},"5d":{"auc_roc":0.733},"7d":{"auc_roc":0.646}},"model_type":"xgboost","n_days":2365,"n_hyp_days":48},{"id":"BKYF1","name":"Buoy Key, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.5,"sal":38.6},"last_observation":"2026-02-22","days_of_data":46,"lat":25.119,"lon":-80.834,"model_type":null},{"id":"CWQT2","name":"Copano Bay West, TX","has_model":true,"has_realtime":true,"status":"active","current":{"do":7.3,"temp":20.6,"sal":34.1,"turbidity":14.0,"ph":8.0},"last_observation":"2026-02-22","days_of_data":42,"currently_hypoxic":false,"lat":28.132,"lon":-97.034,"model_type":"timesfm","timesfm_benchmark":{"1d":{"mae":0.33,"correlation":0.931},"3d":{"mae":0.45,"correlation":0.855},"5d":{"mae":0.54,"correlation":0.783},"7d":{"mae":0.6,"correlation":0.728}},"n_days":2054,"n_hyp_days":12,"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.12},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.12},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.12},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.12}}},{"id":"SREF1","name":"Shark River, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":23.9,"sal":35.4},"last_observation":"2026-02-22","days_of_data":46,"lat":25.352,"lon":-81.1,"model_type":null},{"id":"LMDF1","name":"Little Madeira, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":25.1,"sal":27.8},"last_observation":"2026-02-22","days_of_data":46,"lat":25.176,"lon":-80.633,"model_type":null},{"id":"MQMT2","name":"Mesquite Bay, TX","has_model":true,"has_realtime":true,"status":"active","current":{"do":7.4,"temp":17.7,"sal":31.5,"turbidity":219.0,"ph":8.2},"last_observation":"2026-02-22","days_of_data":46,"currently_hypoxic":false,"lat":28.138,"lon":-96.829,"model_type":"timesfm","timesfm_benchmark":{"1d":{"auc_roc":0.831,"mae":0.48,"correlation":0.88},"3d":{"auc_roc":0.661,"mae":0.68,"correlation":0.73},"5d":{"auc_roc":0.493,"mae":0.84,"correlation":0.595},"7d":{"auc_roc":0.493,"mae":0.93,"correlation":0.516}},"n_days":1484,"n_hyp_days":30,"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.81},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.63},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.61},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.24}}},{"id":"LMRF1","name":"Lostmans River, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.8,"sal":37.1},"last_observation":"2026-02-19","days_of_data":46,"lat":25.556,"lon":-81.169,"model_type":null},{"id":"MWQT2","name":"Copano Bay, Mission-Aransas Reserve, TX","has_model":true,"has_realtime":true,"status":"active","current":{"do":7.3,"temp":19.8,"sal":35.2,"turbidity":14.0,"ph":8.0},"last_observation":"2026-02-22","days_of_data":46,"currently_hypoxic":false,"lat":27.838,"lon":-97.05,"model_type":"timesfm","timesfm_benchmark":{"1d":{"mae":0.25,"correlation":0.908},"3d":{"mae":0.34,"correlation":0.842},"5d":{"mae":0.42,"correlation":0.79},"7d":{"mae":0.45,"correlation":0.757}},"n_days":566,"n_hyp_days":0,"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.0},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.91},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.87},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.87}}},{"id":"CRTA1","name":"Cedar Point, AL","has_model":true,"has_realtime":false,"status":"historical_only","current":null,"predictions":null,"lat":30.355,"lon":-88.14,"timesfm_benchmark":{"1d":{"auc_roc":0.897,"mae":0.78},"3d":{"auc_roc":0.85,"mae":0.89},"5d":{"auc_roc":0.759,"mae":0.96},"7d":{"auc_roc":0.758,"mae":1.04}},"model_type":"timesfm","n_days":3362,"n_hyp_days":48},{"id":"NRRF1","name":"North River, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.6,"sal":23.4},"last_observation":"2026-02-22","days_of_data":46,"lat":25.338,"lon":-80.911,"model_type":null},{"id":"GBCM6","name":"Bayou Cumbest, Grand Bay Reserve, MS","has_model":true,"has_realtime":true,"status":"active","current":{"do":8.0,"temp":20.2,"sal":27.9,"turbidity":6.0,"ph":7.9},"last_observation":"2026-02-12","days_of_data":3,"currently_hypoxic":false,"lat":30.384,"lon":-88.436,"model_type":"timesfm","timesfm_benchmark":{"1d":{"mae":0.62,"correlation":0.848},"3d":{"mae":0.72,"correlation":0.795},"5d":{"mae":0.8,"correlation":0.765},"7d":{"mae":0.87,"correlation":0.759}},"n_days":480,"n_hyp_days":0,"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":8.04},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":8.04},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":8.04},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":8.04}}},{"id":"BNKF1","name":"Butternut Key, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.4,"sal":31.9},"last_observation":"2026-02-22","days_of_data":46,"lat":25.087,"lon":-80.519,"model_type":null},{"id":"BSCA1","name":"Bon Secour, AL","has_model":true,"has_realtime":false,"status":"historical_only","current":null,"predictions":null,"lat":30.328,"lon":-87.829,"timesfm_benchmark":{"1d":{"auc_roc":0.675,"mae":1.08},"3d":{"auc_roc":0.603,"mae":1.24},"5d":{"auc_roc":0.565,"mae":1.32},"7d":{"auc_roc":0.549,"mae":1.35}},"xgboost_benchmark":{"1d":{"auc_roc":0.944},"3d":{"auc_roc":0.834},"5d":{"auc_roc":0.753},"7d":{"auc_roc":0.783}},"model_type":"xgboost","n_days":3576,"n_hyp_days":96},{"id":"LSNF1","name":"Long Sound, FL","has_model":false,"has_realtime":true,"status":"active","current":{"do":null,"temp":24.6,"sal":31.1},"last_observation":"2026-02-22","days_of_data":46,"lat":25.235,"lon":-80.457,"model_type":null},{"id":"DPHA1","name":"Dauphin Island Sea Lab, AL","has_model":true,"has_realtime":false,"status":"historical_only","current":null,"predictions":null,"model_type":"timesfm","lat":30.25,"lon":-88.075,"n_days":4136,"n_hyp_days":17,"timesfm_benchmark":{"1d":{"auc_roc":0.832,"mae":0.56,"correlation":0.916},"3d":{"auc_roc":0.664,"mae":0.66,"correlation":0.877},"5d":{"auc_roc":0.497,"mae":0.72,"correlation":0.847},"7d":{"auc_roc":0.497,"mae":0.77,"correlation":0.819}}},{"id":"PPTA1","name":"Perdido Pass, AL","has_model":true,"has_realtime":false,"status":"monitoring","current":null,"predictions":null,"model_type":"timesfm","lat":30.28,"lon":-87.557,"n_days":3006,"n_hyp_days":0,"timesfm_benchmark":{"1d":{"mae":0.35,"correlation":0.912},"3d":{"mae":0.43,"correlation":0.869},"5d":{"mae":0.48,"correlation":0.842},"7d":{"mae":0.52,"correlation":0.815}}},{"id":"MHPA1","name":"Meaher Park, AL","has_model":true,"has_realtime":false,"status":"historical_only","current":null,"predictions":null,"model_type":"timesfm","lat":30.667,"lon":-87.936,"n_days":4090,"n_hyp_days":26,"timesfm_benchmark":{"1d":{"auc_roc":0.978,"mae":0.65,"correlation":0.902},"3d":{"auc_roc":0.956,"mae":0.82,"correlation":0.843},"5d":{"auc_roc":0.914,"mae":0.89,"correlation":0.805},"7d":{"auc_roc":0.913,"mae":0.95,"correlation":0.769}}},{"id":"WKQA1","name":"Fish River, Weeks Bay Reserve, AL","has_model":true,"has_realtime":false,"status":"historical_only","current":{"sal":21.8,"do":19.8,"turbidity":8.0},"predictions":null,"model_type":"timesfm","lat":30.417,"lon":-87.825,"n_days":1567,"n_hyp_days":4,"timesfm_benchmark":{"1d":{"mae":0.92,"correlation":0.871},"3d":{"mae":1.17,"correlation":0.781},"5d":{"mae":1.25,"correlation":0.74},"7d":{"mae":1.31,"correlation":0.698}},"last_observation":"2026-02-22"},{"id":"GDQM6","name":"Bangs Lake, Grand Bay Reserve, MS","has_model":true,"has_realtime":false,"status":"active","current":{"temp":18.7,"sal":27.1,"do":7.7,"turbidity":26.0,"ph":7.9},"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":7.12},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.99},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.99},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.99}},"model_type":"timesfm","lat":30.373,"lon":-88.324,"n_days":1961,"n_hyp_days":17,"timesfm_benchmark":{"1d":{"auc_roc":0.498,"mae":0.61,"correlation":0.895},"3d":{"auc_roc":0.5,"mae":0.77,"correlation":0.825},"5d":{"auc_roc":0.5,"mae":0.83,"correlation":0.798},"7d":{"auc_roc":0.5,"mae":0.87,"correlation":0.781}},"last_observation":"2026-02-22"},{"id":"MAQT2","name":"Aransas Bay, Mission-Aransas Reserve, TX","has_model":true,"has_realtime":false,"status":"active","current":{"temp":19.6,"sal":33.1,"do":7.1,"turbidity":336.0,"ph":8.1},"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.99},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.8},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.73},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":6.73}},"model_type":"timesfm","lat":28.113,"lon":-96.988,"n_days":1154,"n_hyp_days":2,"timesfm_benchmark":{"1d":{"mae":0.35,"correlation":0.913},"3d":{"mae":0.52,"correlation":0.822},"5d":{"mae":0.64,"correlation":0.721},"7d":{"mae":0.74,"correlation":0.632}},"last_observation":"2026-02-22"},{"id":"RKQF1","name":"Lower Henderson Creek, Rookery Bay Reserve, FL","has_model":true,"has_realtime":false,"status":"active","current":{"temp":23.9,"sal":35.6,"do":4.6,"turbidity":11.0,"ph":7.7},"predictions":{"1d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":4.33},"3d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":4.17},"5d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":4.08},"7d":{"prob":0.0,"risk":"low","engine":"timesfm","forecast_min_do":4.08}},"model_type":"timesfm","lat":26.024,"lon":-81.737,"n_days":563,"n_hyp_days":6,"timesfm_benchmark":{"1d":{"auc_roc":0.902,"mae":0.52,"correlation":0.786},"3d":{"auc_roc":0.642,"mae":0.67,"correlation":0.619},"5d":{"auc_roc":0.474,"mae":0.78,"correlation":0.466},"7d":{"auc_roc":0.478,"mae":0.86,"correlation":0.303}},"last_observation":"2026-02-22"},{"id":"CLBF1","name":"Clam Bayou, FL","has_model":true,"has_realtime":false,"status":"monitoring","current":null,"predictions":null,"model_type":"timesfm","lat":27.725,"lon":-82.708,"n_days":1186,"n_hyp_days":0,"timesfm_benchmark":{"1d":{"mae":0.61,"correlation":0.608},"3d":{"mae":0.63,"correlation":0.597},"5d":{"mae":0.62,"correlation":0.603},"7d":{"mae":0.62,"correlation":0.597}}}],"summary":{"total_stations":58,"stations_with_models":20,"stations_with_predictions":10,"stations_with_warnings":0,"xgboost_stations":4,"timesfm_stations":16,"stations_with_hypoxia_history":15,"stations_with_realtime":49},"model_info":{"xgboost":{"description":"Station-specific XGBoost classifier with engineered features","features":"DO lags, rolling stats, satellite SST/chlorophyll, cross-station deltas","training":"Per-station with 70/30 temporal split"},"timesfm":{"description":"Google TimesFM 1.0 (200M params) zero-shot forecast","approach":"Direct DO time-series forecasting with quantile uncertainty estimation","note":"Used for stations with insufficient training events for XGBoost, excels on sparse-data stations","benchmark":"AUC-ROC up to 0.91 on sparse stations where XGBoost fails (< 0.30)"}}};
 </script>
 </body>
 </html>

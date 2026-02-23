@@ -1,4 +1,4 @@
-name: Update Station Data
+name: Update Ocean Data
 
 on:
   schedule:
@@ -12,6 +12,7 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -22,8 +23,8 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Fetch latest NDBC station data
-        run: python scripts/update_stations.py
+      - name: Fetch all AQUAVIEW Gulf data
+        run: python scripts/update_data.py
 
       - name: Check for changes
         id: check
@@ -37,6 +38,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M UTC")
-          git add docs/data/latest.json docs/data/currents.json
-          git commit -m "Update station data: ${TIMESTAMP}"
+          git add docs/data/*.json
+          git commit -m "Update ocean data: ${TIMESTAMP}"
           git push
