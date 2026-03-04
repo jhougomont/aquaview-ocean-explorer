@@ -247,6 +247,31 @@
         <div class="hl-bar" style="background: linear-gradient(to right, #143cb4, #32a0dc, #6edcd2, #c8b464, #fa9628)"></div>
         <div class="hl-labels"><span>-0.5</span><span>0</span><span>0.5</span><span>1.0</span></div>
     </div>
+    <div class="heat-legend" id="legend-chlorophyll" style="display:none">
+        <div class="hl-title" style="color:#34d399">Chlorophyll-a (mg/m³)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #1e1e5a, #1e3cb4, #22c55e, #fadc28, #fa2814)"></div>
+        <div class="hl-labels"><span>0.01</span><span>0.1</span><span>1</span><span>10</span><span>50</span></div>
+    </div>
+    <div class="heat-legend" id="legend-sst-wms" style="display:none">
+        <div class="hl-title" style="color:#f97316">SST – VIIRS (°C)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #1e3cb4, #50aae6, #32dc14, #f0dc14, #fa6e14, #fa2814)"></div>
+        <div class="hl-labels"><span>10</span><span>18</span><span>22</span><span>26</span><span>32</span></div>
+    </div>
+    <div class="heat-legend" id="legend-ssh" style="display:none">
+        <div class="hl-title" style="color:#a78bfa">Sea Surface Height (m)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #3b0764, #7c3aed, #a78bfa, #e0e7ff, #fbbf24)"></div>
+        <div class="hl-labels"><span>-0.3</span><span>-0.1</span><span>0</span><span>0.1</span><span>0.3</span></div>
+    </div>
+    <div class="heat-legend" id="legend-salinity" style="display:none">
+        <div class="hl-title" style="color:#818cf8">Salinity – SMOS (PSU)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #1e1e5a, #4338ca, #818cf8, #67e8f9, #fbbf24)"></div>
+        <div class="hl-labels"><span>30</span><span>33</span><span>35</span><span>37</span></div>
+    </div>
+    <div class="heat-legend" id="legend-kd490" style="display:none">
+        <div class="hl-title" style="color:#67e8f9">Water Clarity – Kd490 (m⁻¹)</div>
+        <div class="hl-bar" style="background: linear-gradient(to right, #0e7490, #22d3ee, #67e8f9, #fde68a, #f97316)"></div>
+        <div class="hl-labels"><span>0.01</span><span>0.05</span><span>0.1</span><span>0.5</span><span>2.0</span></div>
+    </div>
 </div>
 
 <!-- ═══════ ABOUT ═══════ -->
@@ -1163,6 +1188,10 @@ function toggleLayer(name) {
         if (layerState[name]) leafletLayers[name].addTo(map);
         else map.removeLayer(leafletLayers[name]);
     }
+    // Update legends for satellite products
+    if (['chlorophyll', 'sst', 'ssh', 'salinity', 'kd490'].includes(name)) {
+        updateHeatmapLegends();
+    }
 }
 window.toggleLayer = toggleLayer;
 
@@ -1176,6 +1205,19 @@ function updateHeatmapLegends() {
     if (sst) sst.style.display = layerState.sst_heat ? 'block' : 'none';
     if (dol) dol.style.display = layerState.do_field ? 'block' : 'none';
     if (wl) wl.style.display = layerState.water_level ? 'block' : 'none';
+
+    // Satellite product legends
+    const legendMap = {
+        chlorophyll: 'legend-chlorophyll',
+        sst: 'legend-sst-wms',
+        ssh: 'legend-ssh',
+        salinity: 'legend-salinity',
+        kd490: 'legend-kd490',
+    };
+    for (const [layer, id] of Object.entries(legendMap)) {
+        const el = document.getElementById(id);
+        if (el) el.style.display = layerState[layer] ? 'block' : 'none';
+    }
 }
 
 // ═══════════════════════════════════════════════════════════
