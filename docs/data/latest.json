@@ -1,5 +1,5 @@
 {
-  "updated": "2026-03-21T02:50:33Z",
+  "updated": "2026-03-21T04:29:15Z",
   "update_interval_hours": 6,
   "stations": [
     {
@@ -464,9 +464,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 22.23,
-        "sal": 36.09,
-        "last_obs": "2026-03-21T02:08:00+00:00"
+        "temp": 22.35,
+        "sal": 36.1,
+        "last_obs": "2026-03-21T04:08:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 45,
@@ -568,9 +568,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 21.21,
-        "sal": 36.81,
-        "last_obs": "2026-03-21T00:35:00+00:00"
+        "temp": 21.17,
+        "sal": 36.84,
+        "last_obs": "2026-03-21T03:35:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1393,7 +1393,7 @@
       "has_realtime": false,
       "status": "historical_only",
       "current": {
-        "temp": 17.4
+        "temp": 17.2
       },
       "predictions": null,
       "model_type": "timesfm",
