@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-04T12:02:09Z",
+  "updated": "2026-11-04T14:01:35Z",
   "update_interval_hours": 6,
   "stations": [
     {
@@ -10,9 +10,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.93,
-        "sal": 34.48,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.85,
+        "sal": 34.44,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -27,13 +27,13 @@
       "has_realtime": false,
       "status": "active",
       "current": {
-        "temp": 23.3,
-        "sal": 29.1,
-        "do": 5.0,
+        "temp": 23.5,
+        "sal": 28.9,
+        "do": 5.7,
         "turbidity": 21.0,
-        "ph": 7.7,
+        "ph": 7.8,
         "turb": 10.0,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "predictions": {
         "1d": {
@@ -94,9 +94,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.32,
-        "sal": 20.34,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.24,
+        "sal": 20.43,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 40,
@@ -112,9 +112,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.8,
+        "temp": 27.76,
         "sal": 31.63,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 45,
@@ -130,9 +130,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 25.85,
-        "sal": 33.73,
-        "last_obs": "2026-11-04T10:00:00+00:00"
+        "temp": 26.46,
+        "sal": 34.5,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -148,9 +148,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.21,
-        "sal": 34.32,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.1,
+        "sal": 34.36,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -166,9 +166,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 25.88,
-        "sal": 6.04,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 25.13,
+        "sal": 3.1,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -184,9 +184,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 23.66,
-        "sal": 35.14,
-        "last_obs": "2026-11-04T11:08:00+00:00"
+        "temp": 23.68,
+        "sal": 35.08,
+        "last_obs": "2026-11-04T13:08:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -202,9 +202,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.42,
-        "sal": 18.13,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.4,
+        "sal": 18.03,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -220,9 +220,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.82,
-        "sal": 37.71,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.66,
+        "sal": 37.58,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -238,9 +238,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.08,
-        "sal": 19.51,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.18,
+        "sal": 18.89,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -256,9 +256,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.13,
-        "sal": 42.27,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.96,
+        "sal": 42.6,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -275,8 +275,8 @@
       "current": {
         "do": null,
         "temp": 26.9,
-        "sal": 34.89,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "sal": 34.92,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -292,9 +292,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.82,
-        "sal": 15.0,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.0,
+        "sal": 15.77,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -310,9 +310,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 25.92,
-        "sal": 21.06,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.17,
+        "sal": 19.49,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -328,9 +328,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.41,
-        "sal": 24.0,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.43,
+        "sal": 24.25,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -345,13 +345,13 @@
       "has_realtime": true,
       "status": "active",
       "current": {
-        "do": 4.2,
-        "temp": 23.4,
-        "sal": 29.4,
+        "do": 3.8,
+        "temp": 23.2,
+        "sal": 29.3,
         "turbidity": 14.0,
         "ph": 6.9,
-        "turb": 12.0,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "turb": 13.0,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -429,8 +429,8 @@
       "current": {
         "do": null,
         "temp": 26.92,
-        "sal": 35.27,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "sal": 35.25,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -446,9 +446,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.94,
-        "sal": 14.6,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.98,
+        "sal": 14.8,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -464,9 +464,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.28,
+        "temp": 27.27,
         "sal": 35.89,
-        "last_obs": "2026-11-04T11:08:00+00:00"
+        "last_obs": "2026-11-04T13:08:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 45,
@@ -481,13 +481,13 @@
       "has_realtime": true,
       "status": "active",
       "current": {
-        "do": 6.5,
+        "do": 6.2,
         "temp": 23.1,
-        "sal": 28.0,
+        "sal": 27.3,
         "turbidity": 36.0,
         "ph": 7.9,
-        "turb": 37.0,
-        "last_obs": "2026-11-04T11:15:00+00:00"
+        "turb": 44.0,
+        "last_obs": "2026-11-04T13:15:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 14,
@@ -550,9 +550,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.39,
-        "sal": 25.03,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.36,
+        "sal": 26.43,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -586,9 +586,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 25.81,
-        "sal": 5.55,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 25.56,
+        "sal": 4.11,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -604,9 +604,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.91,
-        "sal": 39.37,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.83,
+        "sal": 38.63,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -656,9 +656,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.88,
-        "sal": 32.14,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.83,
+        "sal": 32.12,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -696,9 +696,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 29.27,
-        "sal": 23.58,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 29.28,
+        "sal": 23.48,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -714,9 +714,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.41,
+        "temp": 26.36,
         "sal": 21.72,
-        "last_obs": "2026-11-04T10:00:00+00:00"
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -732,9 +732,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.19,
-        "sal": 24.64,
-        "last_obs": "2026-11-04T10:00:00+00:00"
+        "temp": 26.05,
+        "sal": 24.54,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -750,9 +750,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.02,
-        "sal": 34.83,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.82,
+        "sal": 34.66,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -768,9 +768,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.78,
-        "sal": 38.9,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.75,
+        "sal": 39.05,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -786,9 +786,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 28.74,
-        "sal": 41.89,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 28.67,
+        "sal": 41.73,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -804,9 +804,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.92,
-        "sal": 36.14,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.84,
+        "sal": 36.08,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -914,9 +914,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.06,
-        "sal": 44.75,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.76,
+        "sal": 44.85,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -931,13 +931,13 @@
       "has_realtime": true,
       "status": "active",
       "current": {
-        "do": 5.7,
-        "temp": 26.3,
-        "sal": 28.4,
+        "do": 6.0,
+        "temp": 25.5,
+        "sal": 27.8,
         "turbidity": 14.0,
         "ph": 8.0,
-        "last_obs": "2026-11-04T11:15:00+00:00",
-        "turb": 9.0
+        "last_obs": "2026-11-04T13:15:00+00:00",
+        "turb": 8.0
       },
       "last_observation": "2026-02-22",
       "days_of_data": 42,
@@ -1000,9 +1000,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.51,
-        "sal": 30.27,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.49,
+        "sal": 30.22,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1018,9 +1018,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 27.11,
-        "sal": 29.13,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 27.15,
+        "sal": 29.92,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1035,13 +1035,13 @@
       "has_realtime": true,
       "status": "active",
       "current": {
-        "do": 6.0,
-        "temp": 25.5,
-        "sal": 31.4,
+        "do": 5.9,
+        "temp": 25.2,
+        "sal": 31.3,
         "turbidity": 219.0,
-        "ph": 8.1,
-        "last_obs": "2026-11-04T11:15:00+00:00",
-        "turb": 29.0
+        "ph": 8.0,
+        "last_obs": "2026-11-04T13:15:00+00:00",
+        "turb": 28.0
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1108,9 +1108,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.4,
-        "sal": 21.32,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.37,
+        "sal": 21.05,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-19",
       "days_of_data": 46,
@@ -1126,12 +1126,12 @@
       "status": "active",
       "current": {
         "do": 6.7,
-        "temp": 25.2,
-        "sal": 31.3,
+        "temp": 25.3,
+        "sal": 31.4,
         "turbidity": 14.0,
         "ph": 8.4,
-        "turb": 1.0,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "turb": 3.0,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1226,9 +1226,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.4,
-        "sal": 10.12,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.26,
+        "sal": 8.92,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1312,9 +1312,9 @@
       "status": "active",
       "current": {
         "do": null,
-        "temp": 26.88,
-        "sal": 39.24,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "temp": 26.81,
+        "sal": 39.19,
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1377,8 +1377,8 @@
       "current": {
         "do": null,
         "temp": 27.19,
-        "sal": 33.39,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "sal": 33.31,
+        "last_obs": "2026-11-04T12:00:00+00:00"
       },
       "last_observation": "2026-02-22",
       "days_of_data": 46,
@@ -1501,13 +1501,13 @@
       "has_realtime": false,
       "status": "historical_only",
       "current": {
-        "sal": 23.5,
-        "do": 6.6,
+        "sal": 23.6,
+        "do": 6.2,
         "turbidity": 8.0,
         "turb": 5.0,
-        "last_obs": "2026-11-04T11:00:00+00:00",
+        "last_obs": "2026-11-04T13:00:00+00:00",
         "temp": 23.7,
-        "ph": 7.7
+        "ph": 7.6
       },
       "predictions": null,
       "model_type": "timesfm",
@@ -1544,11 +1544,11 @@
       "current": {
         "temp": 23.9,
         "sal": 29.7,
-        "do": 5.5,
+        "do": 6.2,
         "turbidity": 26.0,
         "ph": 7.5,
         "turb": 7.0,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "predictions": {
         "1d": {
@@ -1612,13 +1612,13 @@
       "has_realtime": false,
       "status": "active",
       "current": {
-        "temp": 25.4,
-        "sal": 29.9,
+        "temp": 25.2,
+        "sal": 30.0,
         "do": 6.2,
         "turbidity": 336.0,
         "ph": 8.0,
-        "last_obs": "2026-11-04T11:00:00+00:00",
-        "turb": 22.0
+        "last_obs": "2026-11-04T13:00:00+00:00",
+        "turb": 29.0
       },
       "predictions": {
         "1d": {
@@ -1678,13 +1678,13 @@
       "has_realtime": false,
       "status": "active",
       "current": {
-        "temp": 25.8,
-        "sal": 30.6,
+        "temp": 25.7,
+        "sal": 31.4,
         "do": 4.4,
         "turbidity": 11.0,
-        "ph": 7.6,
+        "ph": 7.7,
         "turb": 4.0,
-        "last_obs": "2026-11-04T11:00:00+00:00"
+        "last_obs": "2026-11-04T13:00:00+00:00"
       },
       "predictions": {
         "1d": {
